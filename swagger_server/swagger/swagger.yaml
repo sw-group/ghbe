@@ -1,0 +1,695 @@
+openapi: 3.0.3
+info:
+  title: Mining GitHub
+  description: "This Swagger API provides endpoints for retrieving detailed information\
+    \ about issues, workflows, and repository metadata. It allows users to access\
+    \ various aspects of a repository's management, including issue tracking, workflow\
+    \ management, and general repository information.\n \nSome useful links:\n- [The\
+    \ GitHub project repository](https://github.com/sw-group/ghbe)\n- [The source\
+    \ API definition](*Mettere url openAPI)"
+  contact:
+    email: sw.project.mining@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about GitHub mining project
+  url: https://github.com/sw-group/ghbe
+servers:
+- url: https://localhost:8080/ghbe/api/v1
+tags:
+- name: repository
+  description: Everything about GitHub repository
+paths:
+  /repositories:
+    get:
+      tags:
+      - repository
+      summary: Retrieve repositories with filtering options
+      description: Retrieve repositories with filtering options
+      operationId: get_repositories
+      parameters:
+      - name: name
+        in: query
+        description: |
+          Filter repositories by name. If providing a full name, prefix it with "repo:" (e.g., "repo:owner/name").
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^(repo:[\\w-]+/[\\w-]+|[\\w-]+)$"
+          type: string
+      - name: language
+        in: query
+        description: Filter repositories by programming language
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: isPrivate
+        in: query
+        description: Filter private repositories
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: dateRange
+        in: query
+        description: "Filter repositories by date range (e.g., \"2023-01-01,2023-12-31\"\
+          )"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+          type: string
+      - name: stars
+        in: query
+        description: "Filter repositories by stars range (e.g., \"10,100\")"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: forks
+        in: query
+        description: "Filter repositories by forks range (e.g., \"5,50\")"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: issues
+        in: query
+        description: "Filter repositories by issues range (e.g., \"0,20\")"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: pulls
+        in: query
+        description: "Filter repositories by pull requests range (e.g., \"1,10\")"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: workflows
+        in: query
+        description: "Filter repositories by workflows range (e.g., \"1,5\")"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: page
+        in: query
+        description: Specify the page number for paginated results (default is 1)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: sort
+        in: query
+        description: |
+          Sort repositories by field in ascending or descending order (e.g., "field-asc" or "field-desc").
+          If order is not specified, default to ascending.
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^[\\w-]+(-asc|-desc)?$"
+          type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                title: RepositoryList
+                type: array
+                items:
+                  $ref: '#/components/schemas/Repository'
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+        "422":
+          description: Validation exception
+        "500":
+          description: Internal Server Error
+      x-openapi-router-controller: swagger_server.controllers.repository_controller
+  /repositories/{owner}/{name}:
+    get:
+      tags:
+      - repository
+      summary: Search repositories by filter
+      description: Search repositories by filter
+      operationId: get_repository_by_full_name
+      parameters:
+      - name: owner
+        in: path
+        description: The owner of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      - name: name
+        in: path
+        description: The name of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repository'
+        "400":
+          description: Bad Request
+        "422":
+          description: Validation exception
+        "500":
+          description: Internal Server Error
+      x-openapi-router-controller: swagger_server.controllers.repository_controller
+  /repositories/{owner}/{name}/workflows:
+    get:
+      tags:
+      - repository
+      summary: Search workflows of the repo by fullname
+      description: Search workflows of the repo by fullname
+      operationId: get_workflows_of_repo
+      parameters:
+      - name: owner
+        in: path
+        description: The owner of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      - name: name
+        in: path
+        description: The name of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                title: WorkflowList
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workflow'
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+        "422":
+          description: Validation exception
+        "500":
+          description: Internal Server Error
+      x-openapi-router-controller: swagger_server.controllers.repository_controller
+  /repositories/{owner}/{name}/issues:
+    get:
+      tags:
+      - repository
+      summary: Search issues of the repo by fullname
+      description: Search issues of the repo by fullname
+      operationId: get_issues_of_repo
+      parameters:
+      - name: owner
+        in: path
+        description: The owner of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      - name: name
+        in: path
+        description: The name of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      - name: type
+        in: query
+        description: The type of the issues
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - issues
+          - pulls
+      - name: is
+        in: query
+        description: The state of the issues
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - open
+          - closed
+          - merged
+      - name: dateRange
+        in: query
+        description: "Filter repositories by date range (e.g., \"2023-01-01,2023-12-31\"\
+          )"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+          type: string
+      - name: page
+        in: query
+        description: Specify the page number for paginated results (default is 1)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: sort
+        in: query
+        description: |
+          Sort repositories by field in ascending or descending order (e.g., "field-asc" or "field-desc").
+          If order is not specified, default to ascending.
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^[\\w-]+(-asc|-desc)?$"
+          type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                title: IssuesList
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+        "422":
+          description: Validation exception
+        "500":
+          description: Internal Server Error
+      x-openapi-router-controller: swagger_server.controllers.repository_controller
+  /repositories/{owner}/{name}/statistics:
+    get:
+      tags:
+      - repository
+      summary: Compute the statistics of a repository
+      description: Compute the statistics of a repository
+      operationId: get_statistics_of_repository
+      parameters:
+      - name: owner
+        in: path
+        description: The owner of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      - name: name
+        in: path
+        description: The name of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      - name: dateRange
+        in: query
+        description: "Filter repositories by date range (e.g., \"2023-01-01,2023-12-31\"\
+          )"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+          type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+              x-content-type: application/json
+        "400":
+          description: Bad Request
+        "422":
+          description: Validation exception
+        "500":
+          description: Internal Server Error
+      x-openapi-router-controller: swagger_server.controllers.repository_controller
+components:
+  schemas:
+    Repository:
+      type: object
+      properties:
+        full_name:
+          type: string
+          example: owner/name
+        url:
+          type: string
+          example: https://github.com/owner/name
+        private:
+          type: boolean
+          default: false
+        language:
+          type: string
+          example: python
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        pushed_at:
+          type: string
+          format: date-time
+        stars_count:
+          type: integer
+          format: int64
+          example: 10
+        forks_count:
+          type: integer
+          format: int64
+          example: 5
+        watchers_count:
+          type: integer
+          format: int64
+          example: 10
+        issue_count:
+          type: integer
+          format: int64
+          example: 40
+        pr_count:
+          type: integer
+          format: int64
+          example: 20
+        workflows_count:
+          type: integer
+          format: int64
+          example: 15
+      example:
+        workflows_count: 15
+        private: false
+        issue_count: 40
+        pushed_at: 2000-01-23T04:56:07.000+00:00
+        created_at: 2000-01-23T04:56:07.000+00:00
+        language: python
+        url: https://github.com/owner/name
+        full_name: owner/name
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        stars_count: 10
+        watchers_count: 10
+        forks_count: 5
+        pr_count: 20
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: Workflow
+        path:
+          type: string
+          example: .github/workflows/wk.yml
+        url:
+          type: string
+          example: "https://api.github.com/repos/owner/name/actions/workflows/{workflow_id}"
+        state:
+          type: string
+          example: active
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        file_url:
+          type: string
+          example: https://github.com/owner/name/blob/master/.github/workflows/wk.yml
+      example:
+        path: .github/workflows/wk.yml
+        file_url: https://github.com/owner/name/blob/master/.github/workflows/wk.yml
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        name: Workflow
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        state: active
+        url: "https://api.github.com/repos/owner/name/actions/workflows/{workflow_id}"
+    Issue:
+      type: object
+      properties:
+        number:
+          type: integer
+        repo:
+          type: string
+          example: owner/name
+        title:
+          type: string
+        url:
+          type: string
+        state:
+          type: string
+          enum:
+          - OPEN
+          - CLOSED
+        body:
+          type: string
+        author:
+          type: string
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issue_labels'
+        comments:
+          $ref: '#/components/schemas/Issue_comments'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        closed_at:
+          type: string
+          format: date-time
+      example:
+        number: 0
+        comments:
+          total: 6
+          list:
+          - updated_at: 2000-01-23T04:56:07.000+00:00
+            author:
+              name: name
+              association: CONTRIBUTOR
+              url: url
+            created_at: 2000-01-23T04:56:07.000+00:00
+            message: message
+          - updated_at: 2000-01-23T04:56:07.000+00:00
+            author:
+              name: name
+              association: CONTRIBUTOR
+              url: url
+            created_at: 2000-01-23T04:56:07.000+00:00
+            message: message
+        closed_at: 2000-01-23T04:56:07.000+00:00
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        author: author
+        repo: owner/name
+        created_at: 2000-01-23T04:56:07.000+00:00
+        state: OPEN
+        title: title
+        body: body
+        url: url
+        labels:
+        - name: name
+        - name: name
+    Comment:
+      type: object
+      properties:
+        author:
+          $ref: '#/components/schemas/Comment_author'
+        message:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      example:
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        author:
+          name: name
+          association: CONTRIBUTOR
+          url: url
+        created_at: 2000-01-23T04:56:07.000+00:00
+        message: message
+    Issue_labels:
+      type: object
+      properties:
+        name:
+          type: string
+      example:
+        name: name
+    Issue_comments:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int32
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+      example:
+        total: 6
+        list:
+        - updated_at: 2000-01-23T04:56:07.000+00:00
+          author:
+            name: name
+            association: CONTRIBUTOR
+            url: url
+          created_at: 2000-01-23T04:56:07.000+00:00
+          message: message
+        - updated_at: 2000-01-23T04:56:07.000+00:00
+          author:
+            name: name
+            association: CONTRIBUTOR
+            url: url
+          created_at: 2000-01-23T04:56:07.000+00:00
+          message: message
+    Comment_author:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        association:
+          type: string
+          enum:
+          - CONTRIBUTOR
+          - NONE
+          - COLLABORATOR
+          - MEMBER
+      example:
+        name: name
+        association: CONTRIBUTOR
+        url: url
+    Statistics:
+      type: object
+      properties:
+        pulls:
+          $ref: '#/components/schemas/Statistics_pulls'
+        issues:
+          $ref: '#/components/schemas/Statistics_issues'
+        workflows:
+          $ref: '#/components/schemas/Statistics_workflows'
+      example:
+        workflows:
+          dailyRuns: null
+          typeRuns: null
+        issues:
+          dailyClosedProgress: null
+          dailyOpenedProgress: null
+        pulls:
+          merged: 6
+          dailyClosedProgress:
+            stats:
+              key: 0
+          dailyOpenedProgress: null
+    MapStringNumber:
+      type: object
+      properties:
+        stats:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+      example:
+        stats:
+          key: 0
+    Statistics_pulls:
+      type: object
+      properties:
+        dailyClosedProgress:
+          $ref: '#/components/schemas/MapStringNumber'
+        dailyOpenedProgress:
+          $ref: '#/components/schemas/MapStringNumber'
+        merged:
+          type: integer
+          format: int32
+      example:
+        merged: 6
+        dailyClosedProgress:
+          stats:
+            key: 0
+        dailyOpenedProgress: null
+    Statistics_issues:
+      type: object
+      properties:
+        dailyClosedProgress:
+          $ref: '#/components/schemas/MapStringNumber'
+        dailyOpenedProgress:
+          $ref: '#/components/schemas/MapStringNumber'
+      example:
+        dailyClosedProgress: null
+        dailyOpenedProgress: null
+    Statistics_workflows:
+      type: object
+      properties:
+        dailyRuns:
+          $ref: '#/components/schemas/MapStringNumber'
+        typeRuns:
+          $ref: '#/components/schemas/MapStringNumber'
+      example:
+        dailyRuns: null
+        typeRuns: null
+
