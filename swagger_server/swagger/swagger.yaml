@@ -2,15 +2,15 @@ openapi: 3.0.3
 info:
   title: Mining GitHub
   description: "This Swagger API provides endpoints for retrieving detailed information\
-    \ about issues, workflows, and repository metadata. It allows users to access\
+    \ about issues, workflows, and repository info. It allows users to access\
     \ various aspects of a repository's management, including issue tracking, workflow\
     \ management, and general repository information.\n \nSome useful links:\n- [The\
     \ GitHub project repository](https://github.com/sw-group/ghbe)\n- [The source\
-    \ API definition](*Mettere url openAPI)"
+    \ API definition](https://github.com/sw-group/ghbe/blob/main/swagger_server/swagger/swagger.yaml)"
   contact:
     email: sw.project.mining@gmail.com
   license:
-    name: Apache 2.0
+    name: Apache 2.0 (da vedere)
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 externalDocs:
@@ -175,7 +175,7 @@ paths:
         explode: false
         schema:
           type: string
-          default: owner
+          default: name
       responses:
         "200":
           description: Successful operation
@@ -215,7 +215,7 @@ paths:
         explode: false
         schema:
           type: string
-          default: owner
+          default: name
       responses:
         "200":
           description: Successful operation
@@ -259,7 +259,7 @@ paths:
         explode: false
         schema:
           type: string
-          default: owner
+          default: name
       - name: type
         in: query
         description: The type of the issues
@@ -357,7 +357,7 @@ paths:
         explode: false
         schema:
           type: string
-          default: owner
+          default: name
       - name: dateRange
         in: query
         description: "Filter repositories by date range (e.g., \"2023-01-01,2023-12-31\"\

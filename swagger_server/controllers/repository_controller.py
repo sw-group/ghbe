@@ -1,11 +1,17 @@
+import json
+
 import connexion
 import six
+from werkzeug.exceptions import NotFound
 
+from swagger_server.models import repository
 from swagger_server.models.issue import Issue  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
 from swagger_server.models.workflow import Workflow  # noqa: E501
 from swagger_server import util
+import swagger_server.db.mongo_db as db
+from swagger_server.utils import mapper
 
 
 def get_issues_of_repo(owner, name, type=None, _is=None, date_range=None, page=None, sort=None):  # noqa: E501
@@ -63,6 +69,7 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
 
     :rtype: List[Repository]
     """
+
     return 'do some magic!'
 
 
@@ -78,7 +85,17 @@ def get_repository_by_full_name(owner, name):  # noqa: E501
 
     :rtype: Repository
     """
-    return 'do some magic!'
+    repo_full_name = f"{owner}/{name}"
+
+    # find the repo into db and get it
+    repo = db.get_repository_by_id(repo_full_name)
+
+    if repo is None:
+        raise NotFound
+
+    # map the json into Repository model
+    r = mapper.map_response_to_repository(repo)
+    return r.to_dict(), 200
 
 
 def get_statistics_of_repository(owner, name, date_range=None):  # noqa: E501
@@ -110,4 +127,18 @@ def get_workflows_of_repo(owner, name):  # noqa: E501
 
     :rtype: List[Workflow]
     """
-    return 'do some magic!'
+    repo_full_name = f"{owner}/{name}"
+
+    if not db.exist_repository(repo_full_name):
+        raise NotFound
+
+    workflows_from_db = db.get_repository_workflow(repo_full_name)
+
+    # List to store Workflow instances
+    workflows = []
+
+    # Print each workflow
+    for workflow in workflows_from_db.get('workflows', []):
+        workflows.append(mapper.map_response_to_workflow(workflow).to_dict())
+
+    return workflows, 200
