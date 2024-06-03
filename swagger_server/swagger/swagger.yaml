@@ -2,11 +2,10 @@ openapi: 3.0.3
 info:
   title: Mining GitHub
   description: "This Swagger API provides endpoints for retrieving detailed information\
-    \ about issues, workflows, and repository info. It allows users to access\
-    \ various aspects of a repository's management, including issue tracking, workflow\
-    \ management, and general repository information.\n \nSome useful links:\n- [The\
-    \ GitHub project repository](https://github.com/sw-group/ghbe)\n- [The source\
-    \ API definition](https://github.com/sw-group/ghbe/blob/main/swagger_server/swagger/swagger.yaml)"
+    \ about issues, workflows, and repository info. It allows users to access various\
+    \ aspects of a repository's management, including issue tracking, workflow management,\
+    \ and general repository information.\n \nSome useful links:\n- [The GitHub project\
+    \ repository](https://github.com/sw-group/ghbe)\n- [The source API definition](https://github.com/sw-group/ghbe/blob/main/swagger_server/swagger/swagger.yaml)"
   contact:
     email: sw.project.mining@gmail.com
   license:
@@ -260,18 +259,19 @@ paths:
         schema:
           type: string
           default: name
-      - name: type
+      - name: issue_type
         in: query
         description: The type of the issues
-        required: false
+        required: true
         style: form
         explode: true
         schema:
           type: string
+          default: issues
           enum:
           - issues
           - pulls
-      - name: is
+      - name: state
         in: query
         description: The state of the issues
         required: false
@@ -633,18 +633,13 @@ components:
         workflows:
           $ref: '#/components/schemas/Statistics_workflows'
       example:
-        workflows:
-          dailyRuns: null
-          typeRuns: null
-        issues:
-          dailyClosedProgress: null
-          dailyOpenedProgress: null
+        workflows: {}
+        issues: {}
         pulls:
           merged: 6
           dailyClosedProgress:
             stats:
               key: 0
-          dailyOpenedProgress: null
     MapStringNumber:
       type: object
       properties:
@@ -671,7 +666,6 @@ components:
         dailyClosedProgress:
           stats:
             key: 0
-        dailyOpenedProgress: null
     Statistics_issues:
       type: object
       properties:
@@ -679,9 +673,7 @@ components:
           $ref: '#/components/schemas/MapStringNumber'
         dailyOpenedProgress:
           $ref: '#/components/schemas/MapStringNumber'
-      example:
-        dailyClosedProgress: null
-        dailyOpenedProgress: null
+      example: {}
     Statistics_workflows:
       type: object
       properties:
@@ -689,7 +681,5 @@ components:
           $ref: '#/components/schemas/MapStringNumber'
         typeRuns:
           $ref: '#/components/schemas/MapStringNumber'
-      example:
-        dailyRuns: null
-        typeRuns: null
+      example: {}
 

@@ -1,9 +1,11 @@
 import json
+from datetime import datetime
 
 import connexion
 import six
 from werkzeug.exceptions import NotFound
 
+from swagger_server.db.mongo_operations import MongoOperations
 from swagger_server.models import repository
 from swagger_server.models.issue import Issue  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
@@ -14,7 +16,7 @@ import swagger_server.db.mongo_db as db
 from swagger_server.utils import mapper
 
 
-def get_issues_of_repo(owner, name, type=None, _is=None, date_range=None, page=None, sort=None):  # noqa: E501
+def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, page=None, sort=None):  # noqa: E501
     """Search issues of the repo by fullname
 
     Search issues of the repo by fullname # noqa: E501
@@ -23,10 +25,10 @@ def get_issues_of_repo(owner, name, type=None, _is=None, date_range=None, page=N
     :type owner: str
     :param name: The name of the repository
     :type name: str
-    :param type: The type of the issues
-    :type type: str
-    :param _is: The state of the issues
-    :type _is: str
+    :param issue_type: The type of the issues
+    :type issue_type: str
+    :param state: The state of the issues
+    :type state: str
     :param date_range: Filter repositories by date range (e.g., \&quot;2023-01-01,2023-12-31\&quot;)
     :type date_range: str
     :param page: Specify the page number for paginated results (default is 1)
@@ -36,7 +38,19 @@ def get_issues_of_repo(owner, name, type=None, _is=None, date_range=None, page=N
 
     :rtype: List[Issue]
     """
-    return 'do some magic!'
+
+    repo_full_name = f'{owner}/{name}'
+    mongo_ops = MongoOperations(collection_name=("issues" if issue_type == "issues" else "pullRequests"))
+    try:
+        issues_data = mongo_ops.get_issues(repo=repo_full_name, state=state, date_range=date_range, page=page,
+                                           sort=sort)
+        issues = [
+            mapper.map_response_to_issue(issue.get('issue')).to_dict()
+            for issue in issues_data
+        ]
+        return issues, 200
+    finally:
+        mongo_ops.close()
 
 
 def get_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None, issues=None, pulls=None, workflows=None, page=None, sort=None):  # noqa: E501
@@ -135,10 +149,9 @@ def get_workflows_of_repo(owner, name):  # noqa: E501
     workflows_from_db = db.get_repository_workflow(repo_full_name)
 
     # List to store Workflow instances
-    workflows = []
-
-    # Print each workflow
-    for workflow in workflows_from_db.get('workflows', []):
-        workflows.append(mapper.map_response_to_workflow(workflow).to_dict())
+    workflows = [
+        mapper.map_response_to_workflow(workflow).to_dict()
+        for workflow in workflows_from_db.get('workflows', [])
+    ]
 
     return workflows, 200

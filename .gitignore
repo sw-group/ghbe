@@ -2,6 +2,7 @@
 # 'Scrivimi un file .gitignore in cui all'interno vengono ignorati tutti i file di sistema di PyCharm e altre directory di configurazione non necessarie per l'esecuzione del codice'
 
 # Custom
+logs
 logs/
 
 # PyCharm files

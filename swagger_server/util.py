@@ -1,9 +1,9 @@
 import datetime
+import enum
 
 import six
 import typing
 from swagger_server import type_util
-
 
 def _deserialize(data, klass):
     """Deserializes dict, list, str into an object.
