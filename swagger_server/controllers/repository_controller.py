@@ -84,7 +84,17 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
     :rtype: List[Repository]
     """
 
-    return 'do some magic!'
+    mongo_ops = MongoOperations()
+    try:
+        repositories_data = mongo_ops.get_repositories(name=name, language=language, is_private=is_private, date_range=date_range, stars=stars, forks=forks, issues=issues, pulls=pulls, workflows=workflows, page=page, sort=sort)
+
+        repositories = [
+            mapper.map_response_to_repository(repo).to_dict()
+            for repo in repositories_data
+        ]
+        return repositories, 200
+    finally:
+        mongo_ops.close()
 
 
 def get_repository_by_full_name(owner, name):  # noqa: E501
