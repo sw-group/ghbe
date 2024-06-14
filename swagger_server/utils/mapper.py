@@ -57,12 +57,13 @@ def map_issue_labels(label_dicts):
     return [IssueLabels.from_dict(label) for label in label_dicts.get('nodes')]
 
 
-def map_comment_info(comment):
+def map_response_to_comment(comment):
     return Comment(
-        author=comment.get('author'),
+        author=map_author(dict(comment.get('author'))),
         message=comment.get('body'),
         created_at=util.deserialize_datetime(comment.get('createdAt')) if comment.get('createdAt') else None,
-        updated_at=util.deserialize_datetime(comment['updatedAt']) if comment.get('updatedAt') else None
+        updated_at=util.deserialize_datetime(comment['updatedAt']) if comment.get('updatedAt') else None,
+        association=comment.get('authorAssociation')
     )
 
 

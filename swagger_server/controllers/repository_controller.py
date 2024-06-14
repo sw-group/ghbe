@@ -32,7 +32,17 @@ def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
 
     :rtype: List[Comment]
     """
-    return 'do some magic!'
+    repo_full_name = f'{owner}/{name}'
+    mongo_ops = MongoOperations(collection_name="comments")
+    try:
+        comments_data = mongo_ops.get_comments(repo=repo_full_name, number=number, page=page)
+        comments = [
+            mapper.map_response_to_comment(comment).to_dict()
+            for comment in comments_data
+        ]
+        return comments, 200
+    finally:
+        mongo_ops.close()
 
 
 def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, page=None, sort=None):  # noqa: E501

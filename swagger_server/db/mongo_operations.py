@@ -94,5 +94,21 @@ class MongoOperations:
         issues = list(cursor)
         return issues
 
+    def get_comments(self, repo, number, page=1):
+        query = {'repo': repo, 'issue_number': int(number)}
+
+        # Sorting (1 = asc; -1 = desc)
+        sort_order = -1
+        field = 'createdAt'
+
+        # Pagination
+        per_page = 20  # Define your pagination size
+        skip = (page - 1) * per_page
+
+        cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+
+        comments = list(cursor)
+        return comments
+
     def close(self):
         self.client.close()
