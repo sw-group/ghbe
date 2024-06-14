@@ -185,19 +185,37 @@ def get_statistics_of_repository(owner, name, date_range=None):  # noqa: E501
                                   # MERGED TOTAL
                                   )
 
-    stats_repositories = StatisticsRepositories(stats={})
-    # label element container in label.name
-    # for issue
-    # bool = false
-    #   for issue.label
-    #       if  labels.containers.(issue.label)
-    #       'bug' += 1
-    #        true
-    #  if bool
-    #   continue
-    # check su message
-    #
-    labels = ['bug', 'fix', '...']
+    labels = ['bug', 'documentation', 'duplicate', 'enhancement', 'good first issue', 'help wanted', 'invalid',
+              'question', 'wontfix']
+
+    stats_repositories = StatisticsRepositories() #stats={}
+    from collections import defaultdict
+    from swagger_server.models import MapStringNumber
+    from datetime import datetime
+    print(list_issue_closed)
+    label_count_map = defaultdict(int)
+    for issue in list_issue_closed:
+        found = False
+
+        # Check if any of the labels match
+        for label in labels:
+            for issue_label in issue.labels:
+                if label in issue_label['name']:
+                    label_count_map[label] += 1
+                    found = True
+
+                if found:
+                    continue
+                # If no labels match, check the body for keywords
+                if label in issue.body:
+                    label_count_map[label] += 1
+
+    print(label_count_map)
+
+    #1.Scorro la lista di Open issues+Closed issues
+    #2.Vedo per ogni valore dell'array quante volte la label è contenuta nel nome della lista di issues e mi salvo il numero in
+    #un oggetto tatisticsRepositories(stats={} con campi label e numero calcolato in cui è contenuta
+    #Se non trova etichette allora cerca nel body
 
     stats = Statistics(pulls=stats_pulls, issues=stats_issues)
     return stats.to_dict(), 200
