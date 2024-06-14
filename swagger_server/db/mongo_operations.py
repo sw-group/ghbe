@@ -30,7 +30,7 @@ class MongoOperations:
 
         if stars:
             min_stars, max_stars = stars.split(',')
-            query['data.starts_count'] = { '$gte': int(min_stars), '$lte': int(max_stars) }
+            query['data.starts_count'] = {'$gte': int(min_stars), '$lte': int(max_stars)}
 
         if pulls:
             min_pull, max_pull = pulls.split(',')
@@ -60,8 +60,7 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        print(query)
-        cursor = self.collection.find(query).sort('data.' + field, sort_order).skip(skip).limit(per_page)
+        cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
 
         repositories = list(cursor)
         return repositories
@@ -70,10 +69,10 @@ class MongoOperations:
         query = {'repo': repo}
 
         if state:
-            query['issue.state'] = state.upper()
+            query['state'] = state.upper()
         if date_range:
             start_date, end_date = date_range.split(',')
-            query['issue.createdAt'] = {
+            query['createdAt'] = {
                 '$gte': datetime.strptime(start_date, '%Y-%m-%d'),
                 '$lte': datetime.strptime(end_date, '%Y-%m-%d')
             }
@@ -90,7 +89,7 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        cursor = self.collection.find(query).sort('issue.' + field, sort_order).skip(skip).limit(per_page)
+        cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
 
         issues = list(cursor)
         return issues

@@ -129,7 +129,7 @@ paths:
         style: form
         explode: true
         schema:
-          pattern: "^[\\w-]+(-asc|-desc)?$"
+          pattern: "^[\\w.-]+(-asc|-desc)?$"
           type: string
       responses:
         "200":
@@ -312,7 +312,7 @@ paths:
         style: form
         explode: true
         schema:
-          pattern: "^[\\w-]+(-asc|-desc)?$"
+          pattern: "^[\\w.-]+(-asc|-desc)?$"
           type: string
       responses:
         "200":

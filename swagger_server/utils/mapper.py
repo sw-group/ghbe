@@ -35,18 +35,18 @@ def map_response_to_workflow(response):
     )
 
 
-def map_response_to_issue(repo, issue):
+def map_response_to_issue(issue):
     """Maps a dictionary from MongoDB to an Issue instance."""
     return Issue(
         number=issue.get('number'),
-        repo=repo,
+        repo=issue.get('repo'),
         title=issue.get('title'),
         url=issue.get('url'),
         state=issue.get('state'),
         body=issue.get('body'),
         author=issue.get('author'),
         labels=map_issue_labels(dict(issue.get('labels', []))),
-        comments=map_issue_comments(dict(issue.get('comments', {}))) if issue.get('comments') else None,
+        comments=issue.get('comments'),
         created_at=util.deserialize_datetime(issue.get('createdAt')) if issue.get('createdAt') else None,
         updated_at=util.deserialize_datetime(issue.get('updatedAt')) if issue.get('updatedAt') else None,
         closed_at=util.deserialize_datetime(issue.get('closedAt')) if issue.get('closedAt') else None,
@@ -56,14 +56,6 @@ def map_response_to_issue(repo, issue):
 def map_issue_labels(label_dicts):
     """Maps a list of dictionaries to a list of IssueLabels instances."""
     return [IssueLabels.from_dict(label) for label in label_dicts.get('nodes')]
-
-
-def map_issue_comments(comment_dict):
-    """Maps a dictionary to an IssueComments instance."""
-    return IssueComments(
-        total=comment_dict.get('totalCount'),
-        list=[map_comment_info(dict(comment)) for comment in comment_dict.get('nodes')]
-    )
 
 
 def map_comment_info(comment):

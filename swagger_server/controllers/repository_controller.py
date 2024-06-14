@@ -45,7 +45,7 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
         issues_data = mongo_ops.get_issues(repo=repo_full_name, state=state, date_range=date_range, page=page,
                                            sort=sort)
         issues = [
-            mapper.map_response_to_issue(issue.get('repo'), issue.get('issue')).to_dict()
+            mapper.map_response_to_issue(issue).to_dict()
             for issue in issues_data
         ]
         return issues, 200
