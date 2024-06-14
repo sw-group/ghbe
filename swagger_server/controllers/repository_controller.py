@@ -165,7 +165,16 @@ def get_statistics_of_repository(owner, name, date_range=None):  # noqa: E501
 
     :rtype: Statistics
     """
-    return 'do some magic!'
+    issue_open = get_issues_of_repo(owner, name, "issues", "OPEN", date_range, -1)[0]
+    issue_closed = get_issues_of_repo(owner, name, "issues", "CLOSED", date_range, -1)[0]
+
+    pulls_open = get_issues_of_repo(owner, name, "pulls", "OPEN", date_range, -1)[0]
+    pulls_closed = get_issues_of_repo(owner, name, "pulls", "CLOSED", date_range, -1)[0]
+    print(len(issue_open))
+    print(len(issue_closed))
+
+    print(len(pulls_open))
+    print(len(pulls_closed))
 
 
 def get_workflows_of_repo(owner, name):  # noqa: E501

@@ -644,25 +644,23 @@ components:
           $ref: '#/components/schemas/Statistics_issues'
         workflows:
           $ref: '#/components/schemas/Statistics_workflows'
+        repositories:
+          $ref: '#/components/schemas/Statistics_repositories'
       example:
         workflows: {}
         issues: {}
         pulls:
           merged: 6
           dailyClosedProgress:
-            stats:
-              key: 0
+            key: 0
+        repositories: {}
     MapStringNumber:
       type: object
-      properties:
-        stats:
-          type: object
-          additionalProperties:
-            type: integer
-            format: int32
+      additionalProperties:
+        type: integer
+        format: int32
       example:
-        stats:
-          key: 0
+        key: 0
     Statistics_pulls:
       type: object
       properties:
@@ -676,14 +674,19 @@ components:
       example:
         merged: 6
         dailyClosedProgress:
-          stats:
-            key: 0
+          key: 0
     Statistics_issues:
       type: object
       properties:
         dailyClosedProgress:
           $ref: '#/components/schemas/MapStringNumber'
         dailyOpenedProgress:
+          $ref: '#/components/schemas/MapStringNumber'
+      example: {}
+    Statistics_repositories:
+      type: object
+      properties:
+        stats:
           $ref: '#/components/schemas/MapStringNumber'
       example: {}
     Statistics_workflows:

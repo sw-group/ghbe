@@ -8,6 +8,7 @@ from typing import List, Dict  # noqa: F401
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.statistics_issues import StatisticsIssues  # noqa: F401,E501
 from swagger_server.models.statistics_pulls import StatisticsPulls  # noqa: F401,E501
+from swagger_server.models.statistics_repositories import StatisticsRepositories  # noqa: F401,E501
 from swagger_server.models.statistics_workflows import StatisticsWorkflows  # noqa: F401,E501
 from swagger_server import util
 
@@ -17,7 +18,7 @@ class Statistics(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, pulls: StatisticsPulls=None, issues: StatisticsIssues=None, workflows: StatisticsWorkflows=None):  # noqa: E501
+    def __init__(self, pulls: StatisticsPulls=None, issues: StatisticsIssues=None, workflows: StatisticsWorkflows=None, repositories: StatisticsRepositories=None):  # noqa: E501
         """Statistics - a model defined in Swagger
 
         :param pulls: The pulls of this Statistics.  # noqa: E501
@@ -26,21 +27,26 @@ class Statistics(Model):
         :type issues: StatisticsIssues
         :param workflows: The workflows of this Statistics.  # noqa: E501
         :type workflows: StatisticsWorkflows
+        :param repositories: The repositories of this Statistics.  # noqa: E501
+        :type repositories: StatisticsRepositories
         """
         self.swagger_types = {
             'pulls': StatisticsPulls,
             'issues': StatisticsIssues,
-            'workflows': StatisticsWorkflows
+            'workflows': StatisticsWorkflows,
+            'repositories': StatisticsRepositories
         }
 
         self.attribute_map = {
             'pulls': 'pulls',
             'issues': 'issues',
-            'workflows': 'workflows'
+            'workflows': 'workflows',
+            'repositories': 'repositories'
         }
         self._pulls = pulls
         self._issues = issues
         self._workflows = workflows
+        self._repositories = repositories
 
     @classmethod
     def from_dict(cls, dikt) -> 'Statistics':
@@ -115,3 +121,24 @@ class Statistics(Model):
         """
 
         self._workflows = workflows
+
+    @property
+    def repositories(self) -> StatisticsRepositories:
+        """Gets the repositories of this Statistics.
+
+
+        :return: The repositories of this Statistics.
+        :rtype: StatisticsRepositories
+        """
+        return self._repositories
+
+    @repositories.setter
+    def repositories(self, repositories: StatisticsRepositories):
+        """Sets the repositories of this Statistics.
+
+
+        :param repositories: The repositories of this Statistics.
+        :type repositories: StatisticsRepositories
+        """
+
+        self._repositories = repositories

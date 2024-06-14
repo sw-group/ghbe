@@ -14,20 +14,15 @@ class MapStringNumber(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, stats: Dict[str, int]=None):  # noqa: E501
+    def __init__(self):  # noqa: E501
         """MapStringNumber - a model defined in Swagger
 
-        :param stats: The stats of this MapStringNumber.  # noqa: E501
-        :type stats: Dict[str, int]
         """
         self.swagger_types = {
-            'stats': Dict[str, int]
         }
 
         self.attribute_map = {
-            'stats': 'stats'
         }
-        self._stats = stats
 
     @classmethod
     def from_dict(cls, dikt) -> 'MapStringNumber':
@@ -39,24 +34,3 @@ class MapStringNumber(Model):
         :rtype: MapStringNumber
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def stats(self) -> Dict[str, int]:
-        """Gets the stats of this MapStringNumber.
-
-
-        :return: The stats of this MapStringNumber.
-        :rtype: Dict[str, int]
-        """
-        return self._stats
-
-    @stats.setter
-    def stats(self, stats: Dict[str, int]):
-        """Sets the stats of this MapStringNumber.
-
-
-        :param stats: The stats of this MapStringNumber.
-        :type stats: Dict[str, int]
-        """
-
-        self._stats = stats

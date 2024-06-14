@@ -24,8 +24,8 @@ class MongoOperations:
         if date_range:
             start_date, end_date = date_range.split(',')
             query['data.created_at'] = {
-                '$gte': datetime.strptime(start_date, '%Y-%m-%d'),
-                '$lte': datetime.strptime(end_date, '%Y-%m-%d')
+                '$gte': datetime.strptime(start_date, '%Y-%m-%d').isoformat(),
+                '$lte': datetime.strptime(end_date, '%Y-%m-%d').isoformat()
             }
 
         if stars:
@@ -73,8 +73,8 @@ class MongoOperations:
         if date_range:
             start_date, end_date = date_range.split(',')
             query['createdAt'] = {
-                '$gte': datetime.strptime(start_date, '%Y-%m-%d'),
-                '$lte': datetime.strptime(end_date, '%Y-%m-%d')
+                '$gte': datetime.strptime(start_date, '%Y-%m-%d').isoformat(),
+                '$lte': datetime.strptime(end_date, '%Y-%m-%d').isoformat()
             }
 
         # Sorting (1 = asc; -1 = desc)
@@ -89,8 +89,11 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
-
+        if page == -1:
+            cursor = self.collection.find(query).sort(field, sort_order)
+        else:
+            cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+        print(query)
         issues = list(cursor)
         return issues
 

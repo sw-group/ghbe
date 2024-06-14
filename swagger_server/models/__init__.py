@@ -12,5 +12,6 @@ from swagger_server.models.repository import Repository
 from swagger_server.models.statistics import Statistics
 from swagger_server.models.statistics_issues import StatisticsIssues
 from swagger_server.models.statistics_pulls import StatisticsPulls
+from swagger_server.models.statistics_repositories import StatisticsRepositories
 from swagger_server.models.statistics_workflows import StatisticsWorkflows
 from swagger_server.models.workflow import Workflow
