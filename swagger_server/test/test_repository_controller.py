@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
+from swagger_server.models.comment import Comment  # noqa: E501
 from swagger_server.models.issue import Issue  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
@@ -15,13 +16,26 @@ from swagger_server.test import BaseTestCase
 class TestRepositoryController(BaseTestCase):
     """RepositoryController integration test stubs"""
 
+    def test_get_comments_of_issue(self):
+        """Test case for get_comments_of_issue
+
+        Search issues of the repo by fullname
+        """
+        query_string = [('page', 1)]
+        response = self.client.open(
+            '/ghbe/api/v1/repositories/{owner}/{name}/issues/{number}/comments'.format(owner='owner_example', name='name_example', number='number_example'),
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_issues_of_repo(self):
         """Test case for get_issues_of_repo
 
         Search issues of the repo by fullname
         """
-        query_string = [('type', 'type_example'),
-                        ('_is', '_is_example'),
+        query_string = [('issue_type', 'issues'),
+                        ('state', 'state_example'),
                         ('date_range', 'date_range_example'),
                         ('page', 1),
                         ('sort', 'sort_example')]

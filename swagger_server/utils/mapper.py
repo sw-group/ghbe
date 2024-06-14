@@ -1,5 +1,5 @@
 from swagger_server import util
-from swagger_server.models import Repository, Workflow, Issue, IssueLabels, IssueComments, Comment
+from swagger_server.models import Repository, Workflow, Issue, IssueLabels, Comment, Author
 
 
 def map_response_to_repository(response):
@@ -39,14 +39,13 @@ def map_response_to_issue(issue):
     """Maps a dictionary from MongoDB to an Issue instance."""
     return Issue(
         number=issue.get('number'),
-        repo=issue.get('repo'),
         title=issue.get('title'),
         url=issue.get('url'),
         state=issue.get('state'),
         body=issue.get('body'),
-        author=issue.get('author'),
+        author=map_author(dict(issue.get('author'))),
         labels=map_issue_labels(dict(issue.get('labels', []))),
-        comments=issue.get('comments'),
+        comments=dict(issue.get('comments')).get('totalCount'),
         created_at=util.deserialize_datetime(issue.get('createdAt')) if issue.get('createdAt') else None,
         updated_at=util.deserialize_datetime(issue.get('updatedAt')) if issue.get('updatedAt') else None,
         closed_at=util.deserialize_datetime(issue.get('closedAt')) if issue.get('closedAt') else None,
@@ -65,3 +64,11 @@ def map_comment_info(comment):
         created_at=util.deserialize_datetime(comment.get('createdAt')) if comment.get('createdAt') else None,
         updated_at=util.deserialize_datetime(comment['updatedAt']) if comment.get('updatedAt') else None
     )
+
+
+def map_author(author):
+    return Author(
+        name=author.get('login'),
+        url=author.get('url')
+    )
+

@@ -16,6 +16,25 @@ import swagger_server.db.mongo_db as db
 from swagger_server.utils import mapper
 
 
+def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
+    """Search issues of the repo by fullname
+
+    Search issues of the repo by fullname # noqa: E501
+
+    :param owner: The owner of the repository
+    :type owner: str
+    :param name: The name of the repository
+    :type name: str
+    :param number: The number of the issue
+    :type number: str
+    :param page: Specify the page number for paginated results (default is 1)
+    :type page: int
+
+    :rtype: List[Comment]
+    """
+    return 'do some magic!'
+
+
 def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, page=None, sort=None):  # noqa: E501
     """Search issues of the repo by fullname
 

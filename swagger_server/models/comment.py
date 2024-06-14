@@ -6,7 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.comment_author import CommentAuthor  # noqa: F401,E501
+from swagger_server.models.author import Author  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,35 +15,40 @@ class Comment(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, author: CommentAuthor=None, message: str=None, created_at: datetime=None, updated_at: datetime=None):  # noqa: E501
+    def __init__(self, author: Author=None, message: str=None, created_at: datetime=None, updated_at: datetime=None, association: str=None):  # noqa: E501
         """Comment - a model defined in Swagger
 
         :param author: The author of this Comment.  # noqa: E501
-        :type author: CommentAuthor
+        :type author: Author
         :param message: The message of this Comment.  # noqa: E501
         :type message: str
         :param created_at: The created_at of this Comment.  # noqa: E501
         :type created_at: datetime
         :param updated_at: The updated_at of this Comment.  # noqa: E501
         :type updated_at: datetime
+        :param association: The association of this Comment.  # noqa: E501
+        :type association: str
         """
         self.swagger_types = {
-            'author': CommentAuthor,
+            'author': Author,
             'message': str,
             'created_at': datetime,
-            'updated_at': datetime
+            'updated_at': datetime,
+            'association': str
         }
 
         self.attribute_map = {
             'author': 'author',
             'message': 'message',
             'created_at': 'created_at',
-            'updated_at': 'updated_at'
+            'updated_at': 'updated_at',
+            'association': 'association'
         }
         self._author = author
         self._message = message
         self._created_at = created_at
         self._updated_at = updated_at
+        self._association = association
 
     @classmethod
     def from_dict(cls, dikt) -> 'Comment':
@@ -57,22 +62,22 @@ class Comment(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def author(self) -> CommentAuthor:
+    def author(self) -> Author:
         """Gets the author of this Comment.
 
 
         :return: The author of this Comment.
-        :rtype: CommentAuthor
+        :rtype: Author
         """
         return self._author
 
     @author.setter
-    def author(self, author: CommentAuthor):
+    def author(self, author: Author):
         """Sets the author of this Comment.
 
 
         :param author: The author of this Comment.
-        :type author: CommentAuthor
+        :type author: Author
         """
 
         self._author = author
@@ -139,3 +144,24 @@ class Comment(Model):
         """
 
         self._updated_at = updated_at
+
+    @property
+    def association(self) -> str:
+        """Gets the association of this Comment.
+
+
+        :return: The association of this Comment.
+        :rtype: str
+        """
+        return self._association
+
+    @association.setter
+    def association(self, association: str):
+        """Sets the association of this Comment.
+
+
+        :param association: The association of this Comment.
+        :type association: str
+        """
+
+        self._association = association

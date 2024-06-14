@@ -3,10 +3,9 @@
 # flake8: noqa
 from __future__ import absolute_import
 # import models into model package
+from swagger_server.models.author import Author
 from swagger_server.models.comment import Comment
-from swagger_server.models.comment_author import CommentAuthor
 from swagger_server.models.issue import Issue
-from swagger_server.models.issue_comments import IssueComments
 from swagger_server.models.issue_labels import IssueLabels
 from swagger_server.models.map_string_number import MapStringNumber
 from swagger_server.models.repository import Repository
