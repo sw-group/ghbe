@@ -13,6 +13,7 @@ from swagger_server.models.statistics import Statistics  # noqa: E501
 from swagger_server.models.workflow import Workflow  # noqa: E501
 from swagger_server import util
 import swagger_server.db.mongo_db as db
+from swagger_server.util import generate_date_count_map
 from swagger_server.utils import mapper
 
 
@@ -82,7 +83,8 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
         mongo_ops.close()
 
 
-def get_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None, issues=None, pulls=None, workflows=None, page=None, sort=None):  # noqa: E501
+def get_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None, issues=None,
+                     pulls=None, workflows=None, page=None, sort=None):  # noqa: E501
     """Retrieve repositories with filtering options
 
     Retrieve repositories with filtering options # noqa: E501
@@ -115,7 +117,9 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
 
     mongo_ops = MongoOperations()
     try:
-        repositories_data = mongo_ops.get_repositories(name=name, language=language, is_private=is_private, date_range=date_range, stars=stars, forks=forks, issues=issues, pulls=pulls, workflows=workflows, page=page, sort=sort)
+        repositories_data = mongo_ops.get_repositories(name=name, language=language, is_private=is_private,
+                                                       date_range=date_range, stars=stars, forks=forks, issues=issues,
+                                                       pulls=pulls, workflows=workflows, page=page, sort=sort)
 
         repositories = [
             mapper.map_response_to_repository(repo).to_dict()
@@ -165,16 +169,38 @@ def get_statistics_of_repository(owner, name, date_range=None):  # noqa: E501
 
     :rtype: Statistics
     """
-    issue_open = get_issues_of_repo(owner, name, "issues", "OPEN", date_range, -1)[0]
-    issue_closed = get_issues_of_repo(owner, name, "issues", "CLOSED", date_range, -1)[0]
+    list_issue_open = get_issues_of_repo(owner, name, "issues", "OPEN", date_range, -1)[0]
+    list_issue_closed = get_issues_of_repo(owner, name, "issues", "CLOSED", date_range, -1)[0]
 
-    pulls_open = get_issues_of_repo(owner, name, "pulls", "OPEN", date_range, -1)[0]
-    pulls_closed = get_issues_of_repo(owner, name, "pulls", "CLOSED", date_range, -1)[0]
-    print(len(issue_open))
-    print(len(issue_closed))
+    list_pulls_open = get_issues_of_repo(owner, name, "pulls", "OPEN", date_range, -1)[0]
+    list_pulls_closed = get_issues_of_repo(owner, name, "pulls", "CLOSED", date_range, -1)[0]
 
-    print(len(pulls_open))
-    print(len(pulls_closed))
+    from ..models import Statistics, StatisticsPulls, StatisticsIssues, StatisticsRepositories
+
+    stats_issues = StatisticsIssues(daily_closed_progress=generate_date_count_map(list_issue_closed),
+                                    daily_opened_progress=generate_date_count_map(list_issue_open))
+
+    stats_pulls = StatisticsPulls(daily_closed_progress=generate_date_count_map(list_pulls_closed),
+                                  daily_opened_progress=generate_date_count_map(list_pulls_open)
+                                  # MERGED TOTAL
+                                  )
+
+    stats_repositories = StatisticsRepositories(stats={})
+    # label element container in label.name
+    # for issue
+    # bool = false
+    #   for issue.label
+    #       if  labels.containers.(issue.label)
+    #       'bug' += 1
+    #        true
+    #  if bool
+    #   continue
+    # check su message
+    #
+    labels = ['bug', 'fix', '...']
+
+    stats = Statistics(pulls=stats_pulls, issues=stats_issues)
+    return stats.to_dict(), 200
 
 
 def get_workflows_of_repo(owner, name):  # noqa: E501

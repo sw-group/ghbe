@@ -5,6 +5,8 @@ import six
 import typing
 from swagger_server import type_util
 
+
+
 def _deserialize(data, klass):
     """Deserializes dict, list, str into an object.
 
@@ -140,3 +142,21 @@ def _deserialize_dict(data, boxed_type):
     """
     return {k: _deserialize(v, boxed_type)
             for k, v in six.iteritems(data)}
+
+
+## CUSTOM
+def generate_date_count_map(issue_list):
+    from collections import defaultdict
+    from swagger_server.models import MapStringNumber
+    from datetime import datetime
+    date_count_map = defaultdict(int)
+
+    for issue in issue_list:
+        # Extract the date part from the created_at field
+        created_date = issue['created_at'].date()
+        # Convert the date to a string for dictionary keys
+        created_date_str = created_date.isoformat()
+        # Increment the count for the extracted date
+        date_count_map[created_date_str] += 1
+
+    return MapStringNumber.from_dict(date_count_map)
