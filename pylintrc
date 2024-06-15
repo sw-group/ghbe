@@ -12,6 +12,9 @@ load-plugins=
 # Use multiple processes to speed up Pylint.
 jobs=3
 
+[MESSAGES CONTROL]
+disable=unused-import
+
 [REPORTS]
 # Set the output format. Available formats are text, parseable, colorized, msvs
 # (visual studio) and html. You can also give a reporter class, eg
@@ -19,7 +22,7 @@ jobs=3
 output-format=parseable
 
 # Tells whether to display a full report or only the messages
-reports=no
+reports=yes
 
 [MESSAGES CONTROL]
 # Only show warnings with the listed confidence levels. Leave empty to show all.
