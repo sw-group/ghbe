@@ -83,7 +83,7 @@ class MongoOperations:
             field, order = sort.split('-')
             sort_order = 1 if order == 'asc' else -1
         else:
-            field = 'createdAt'
+            field = 'updatedAt'
 
         # Pagination
         per_page = 20  # Define your pagination size

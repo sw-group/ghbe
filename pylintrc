@@ -1,0 +1,63 @@
+[MASTER]
+# A comma-separated list of package or module names from where C extensions may be loaded.
+extension-pkg-whitelist=
+
+# Add files or directories to the blacklist. They should be base names, not paths.
+ignore=CVS
+ignore-patterns=
+
+# List of plugins (as comma separated values of python module names) to load.
+load-plugins=
+
+# Use multiple processes to speed up Pylint.
+jobs=3
+
+[REPORTS]
+# Set the output format. Available formats are text, parseable, colorized, msvs
+# (visual studio) and html. You can also give a reporter class, eg
+# mypackage.mymodule.MyReporterClass.
+output-format=parseable
+
+# Tells whether to display a full report or only the messages
+reports=no
+
+[MESSAGES CONTROL]
+# Only show warnings with the listed confidence levels. Leave empty to show all.
+confidence=
+# Disable the message, report, category or checker with the given id(s).
+disable=C0111,  # Missing docstring
+
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=100
+
+[BASIC]
+# Regular expression matching correct constant names
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+
+# Regular expression matching correct function names
+function-rgx=[a-z_][a-z0-9_]{2,30}$
+
+[ELIF]
+# Maximum number of nested blocks for function / method body
+max-nested-blocks=5
+
+[MISCELLANEOUS]
+# List of note tags to take in consideration, separated by a comma.
+notes=FIXME,TODO
+
+[DESIGN]
+# Maximum number of arguments for a function or method
+max-args=7
+
+# Maximum number of locals for a function or method
+max-locals=15
+
+# Maximum number of return / yield for function / method body
+max-returns=6
+
+# Minimum number of public methods for a class
+min-public-methods=0
+
+# Maximum number of boolean expressions in a if statement
+max-bool-expr=3

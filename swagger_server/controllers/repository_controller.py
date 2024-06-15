@@ -6,12 +6,9 @@ import six
 from werkzeug.exceptions import NotFound
 
 from swagger_server.db.mongo_operations import MongoOperations
-from swagger_server.models import repository, StatisticsWorkflows
-from swagger_server.models.issue import Issue  # noqa: E501
+from swagger_server.models import StatisticsWorkflows
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
-from swagger_server.models.workflow import Workflow  # noqa: E501
-from swagger_server import util
 import swagger_server.db.mongo_db as db
 from swagger_server.util import generate_date_count_map, generate_label_count_map, convert_size_to_bytes, \
     generate_metrics_workflow_map
