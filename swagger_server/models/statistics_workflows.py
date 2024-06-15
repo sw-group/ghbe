@@ -18,7 +18,7 @@ class StatisticsWorkflows(Model):
     def __init__(self, metrics: MapStringNumber=None):  # noqa: E501
         """StatisticsWorkflows - a model defined in Swagger
 
-        :param metrics: The daily_runs of this StatisticsWorkflows.  # noqa: E501
+        :param metrics: The metrics of this StatisticsWorkflows.  # noqa: E501
         :type metrics: MapStringNumber
         """
         self.swagger_types = {
@@ -53,7 +53,7 @@ class StatisticsWorkflows(Model):
 
     @metrics.setter
     def metrics(self, metrics: MapStringNumber):
-        """Sets the daily_runs of this StatisticsWorkflows.
+        """Sets the metrics of this StatisticsWorkflows.
 
 
         :param metrics: The metrics of this StatisticsWorkflows.

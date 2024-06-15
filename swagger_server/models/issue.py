@@ -16,11 +16,13 @@ class Issue(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, number: int=None, title: str=None, url: str=None, state: str=None, body: str=None, author: Author=None, labels: List[IssueLabels]=None, comments: int=None, created_at: datetime=None, updated_at: datetime=None, closed_at: datetime=None):  # noqa: E501
+    def __init__(self, number: int=None, repo: str=None, title: str=None, url: str=None, state: str=None, body: str=None, author: Author=None, labels: List[IssueLabels]=None, comments: int=None, created_at: datetime=None, updated_at: datetime=None, closed_at: datetime=None):  # noqa: E501
         """Issue - a model defined in Swagger
 
         :param number: The number of this Issue.  # noqa: E501
         :type number: int
+        :param repo: The repo of this Issue.  # noqa: E501
+        :type repo: str
         :param title: The title of this Issue.  # noqa: E501
         :type title: str
         :param url: The url of this Issue.  # noqa: E501
@@ -44,6 +46,7 @@ class Issue(Model):
         """
         self.swagger_types = {
             'number': int,
+            'repo': str,
             'title': str,
             'url': str,
             'state': str,
@@ -58,6 +61,7 @@ class Issue(Model):
 
         self.attribute_map = {
             'number': 'number',
+            'repo': 'repo',
             'title': 'title',
             'url': 'url',
             'state': 'state',
@@ -70,6 +74,7 @@ class Issue(Model):
             'closed_at': 'closed_at'
         }
         self._number = number
+        self._repo = repo
         self._title = title
         self._url = url
         self._state = state
@@ -112,6 +117,27 @@ class Issue(Model):
         """
 
         self._number = number
+
+    @property
+    def repo(self) -> str:
+        """Gets the repo of this Issue.
+
+
+        :return: The repo of this Issue.
+        :rtype: str
+        """
+        return self._repo
+
+    @repo.setter
+    def repo(self, repo: str):
+        """Sets the repo of this Issue.
+
+
+        :param repo: The repo of this Issue.
+        :type repo: str
+        """
+
+        self._repo = repo
 
     @property
     def title(self) -> str:

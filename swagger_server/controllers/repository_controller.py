@@ -10,7 +10,7 @@ from swagger_server.models import StatisticsWorkflows
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
 import swagger_server.db.mongo_db as db
-from swagger_server.util import generate_date_count_map, generate_label_count_map, convert_size_to_bytes, \
+from swagger_server.utils.util import generate_date_count_map, generate_label_count_map, \
     generate_metrics_workflow_map
 from swagger_server.utils import mapper
 

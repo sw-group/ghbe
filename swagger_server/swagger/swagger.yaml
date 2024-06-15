@@ -129,7 +129,7 @@ paths:
         style: form
         explode: true
         schema:
-          pattern: "^[\\w-]+(-asc|-desc)?$"
+          pattern: "^[\\w.-]+(-asc|-desc)?$"
           type: string
       responses:
         "200":
@@ -271,7 +271,7 @@ paths:
           enum:
           - issues
           - pulls
-      - name: is
+      - name: state
         in: query
         description: The state of the issues
         required: false
@@ -312,7 +312,7 @@ paths:
         style: form
         explode: true
         schema:
-          pattern: "^[\\w-]+(-asc|-desc)?$"
+          pattern: "^[\\w.-]+(-asc|-desc)?$"
           type: string
       responses:
         "200":
@@ -324,6 +324,69 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Issue'
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+        "422":
+          description: Validation exception
+        "500":
+          description: Internal Server Error
+      x-openapi-router-controller: swagger_server.controllers.repository_controller
+  /repositories/{owner}/{name}/issues/{number}/comments:
+    get:
+      tags:
+      - repository
+      summary: Search issues of the repo by fullname
+      description: Search issues of the repo by fullname
+      operationId: get_comments_of_issue
+      parameters:
+      - name: owner
+        in: path
+        description: The owner of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: owner
+      - name: name
+        in: path
+        description: The name of the repository
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: name
+      - name: number
+        in: path
+        description: The number of the issue
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: "1"
+      - name: page
+        in: query
+        description: Specify the page number for paginated results (default is 1)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                title: CommentsList
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
                 x-content-type: application/json
         "400":
           description: Bad Request
@@ -510,13 +573,14 @@ components:
         body:
           type: string
         author:
-          type: string
+          $ref: '#/components/schemas/Author'
         labels:
           type: array
           items:
             $ref: '#/components/schemas/Issue_labels'
         comments:
-          $ref: '#/components/schemas/Issue_comments'
+          type: integer
+          format: int32
         created_at:
           type: string
           format: date-time
@@ -528,27 +592,12 @@ components:
           format: date-time
       example:
         number: 0
-        comments:
-          total: 6
-          list:
-          - updated_at: 2000-01-23T04:56:07.000+00:00
-            author:
-              name: name
-              association: CONTRIBUTOR
-              url: url
-            created_at: 2000-01-23T04:56:07.000+00:00
-            message: message
-          - updated_at: 2000-01-23T04:56:07.000+00:00
-            author:
-              name: name
-              association: CONTRIBUTOR
-              url: url
-            created_at: 2000-01-23T04:56:07.000+00:00
-            message: message
+        comments: 6
         closed_at: 2000-01-23T04:56:07.000+00:00
         updated_at: 2000-01-23T04:56:07.000+00:00
-        author: author
-        repo: owner/name
+        author:
+          name: name
+          url: url
         created_at: 2000-01-23T04:56:07.000+00:00
         state: OPEN
         title: title
@@ -561,7 +610,7 @@ components:
       type: object
       properties:
         author:
-          $ref: '#/components/schemas/Comment_author'
+          $ref: '#/components/schemas/Author'
         message:
           type: string
         created_at:
@@ -570,11 +619,12 @@ components:
         updated_at:
           type: string
           format: date-time
+        association:
+          type: string
       example:
         updated_at: 2000-01-23T04:56:07.000+00:00
         author:
           name: name
-          association: CONTRIBUTOR
           url: url
         created_at: 2000-01-23T04:56:07.000+00:00
         message: message
@@ -585,50 +635,15 @@ components:
           type: string
       example:
         name: name
-    Issue_comments:
-      type: object
-      properties:
-        total:
-          type: integer
-          format: int32
-        list:
-          type: array
-          items:
-            $ref: '#/components/schemas/Comment'
-      example:
-        total: 6
-        list:
-        - updated_at: 2000-01-23T04:56:07.000+00:00
-          author:
-            name: name
-            association: CONTRIBUTOR
-            url: url
-          created_at: 2000-01-23T04:56:07.000+00:00
-          message: message
-        - updated_at: 2000-01-23T04:56:07.000+00:00
-          author:
-            name: name
-            association: CONTRIBUTOR
-            url: url
-          created_at: 2000-01-23T04:56:07.000+00:00
-          message: message
-    Comment_author:
+    Author:
       type: object
       properties:
         name:
           type: string
         url:
           type: string
-        association:
-          type: string
-          enum:
-          - CONTRIBUTOR
-          - NONE
-          - COLLABORATOR
-          - MEMBER
       example:
         name: name
-        association: CONTRIBUTOR
         url: url
     Statistics:
       type: object
@@ -639,7 +654,10 @@ components:
           $ref: '#/components/schemas/Statistics_issues'
         workflows:
           $ref: '#/components/schemas/Statistics_workflows'
+        repositories:
+          $ref: '#/components/schemas/Statistics_repositories'
       example:
+        repositories: {}
         workflows: {}
         issues: {}
         pulls:
@@ -649,14 +667,10 @@ components:
               key: 0
     MapStringNumber:
       type: object
-      properties:
-        stats:
-          type: object
-          additionalProperties:
-            type: integer
-            format: int32
+      additionalProperties:
+        type: integer
+        format: int32
       example:
-        stats:
           key: 0
     Statistics_pulls:
       type: object
@@ -685,6 +699,12 @@ components:
       type: object
       properties:
         metrics:
+          $ref: '#/components/schemas/MapStringNumber'
+      example: {}
+    Statistics_repositories:
+      type: object
+      properties:
+        stats:
           $ref: '#/components/schemas/MapStringNumber'
       example: {}
 
