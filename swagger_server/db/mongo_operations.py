@@ -23,7 +23,7 @@ class MongoOperations:
 
         if date_range:
             start_date, end_date = date_range.split(',')
-            query['data.created_at'] = {
+            query['data.updated_at'] = {
                 '$gte': datetime.strptime(start_date, '%Y-%m-%d').isoformat(),
                 '$lte': datetime.strptime(end_date, '%Y-%m-%d').isoformat()
             }
@@ -54,7 +54,7 @@ class MongoOperations:
             field, order = sort.split('-')
             sort_order = 1 if order == 'asc' else -1
         else:
-            field = 'created_at'
+            field = 'updated_at'
 
         # Pagination
         per_page = 20  # Define your pagination size
@@ -72,7 +72,7 @@ class MongoOperations:
             query['state'] = state.upper()
         if date_range:
             start_date, end_date = date_range.split(',')
-            query['createdAt'] = {
+            query['updatedAt'] = {
                 '$gte': datetime.strptime(start_date, '%Y-%m-%d').isoformat(),
                 '$lte': datetime.strptime(end_date, '%Y-%m-%d').isoformat()
             }

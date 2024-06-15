@@ -6,14 +6,15 @@ import six
 from werkzeug.exceptions import NotFound
 
 from swagger_server.db.mongo_operations import MongoOperations
-from swagger_server.models import repository
+from swagger_server.models import repository, StatisticsWorkflows
 from swagger_server.models.issue import Issue  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
 from swagger_server.models.workflow import Workflow  # noqa: E501
 from swagger_server import util
 import swagger_server.db.mongo_db as db
-from swagger_server.util import generate_date_count_map
+from swagger_server.util import generate_date_count_map, generate_label_count_map, convert_size_to_bytes, \
+    generate_metrics_workflow_map
 from swagger_server.utils import mapper
 
 
@@ -174,6 +175,9 @@ def get_statistics_of_repository(owner, name, date_range=None):  # noqa: E501
 
     list_pulls_open = get_issues_of_repo(owner, name, "pulls", "OPEN", date_range, -1)[0]
     list_pulls_closed = get_issues_of_repo(owner, name, "pulls", "CLOSED", date_range, -1)[0]
+    list_pulls_merged = get_issues_of_repo(owner, name, "pulls", "MERGED", date_range, -1)[0]
+
+    list_issues = list_issue_open + list_issue_closed + list_pulls_open + list_pulls_closed
 
     from ..models import Statistics, StatisticsPulls, StatisticsIssues, StatisticsRepositories
 
@@ -181,43 +185,20 @@ def get_statistics_of_repository(owner, name, date_range=None):  # noqa: E501
                                     daily_opened_progress=generate_date_count_map(list_issue_open))
 
     stats_pulls = StatisticsPulls(daily_closed_progress=generate_date_count_map(list_pulls_closed),
-                                  daily_opened_progress=generate_date_count_map(list_pulls_open)
-                                  # MERGED TOTAL
+                                  daily_opened_progress=generate_date_count_map(list_pulls_open),
+                                  merged=len(list_pulls_merged)
                                   )
 
-    labels = ['bug', 'documentation', 'duplicate', 'enhancement', 'good first issue', 'help wanted', 'invalid',
-              'question', 'wontfix']
+    stats_repositories = StatisticsRepositories(stats=generate_label_count_map(list_issues))
 
-    stats_repositories = StatisticsRepositories() #stats={}
-    from collections import defaultdict
-    from swagger_server.models import MapStringNumber
-    from datetime import datetime
-    print(list_issue_closed)
-    label_count_map = defaultdict(int)
-    for issue in list_issue_closed:
-        found = False
+    list_workflows = get_workflows_of_repo(owner, name)[0]
 
-        # Check if any of the labels match
-        for label in labels:
-            for issue_label in issue.labels:
-                if label in issue_label['name']:
-                    label_count_map[label] += 1
-                    found = True
+    stats_workflows = StatisticsWorkflows(metrics=generate_metrics_workflow_map(list_workflows))
 
-                if found:
-                    continue
-                # If no labels match, check the body for keywords
-                if label in issue.body:
-                    label_count_map[label] += 1
-
-    print(label_count_map)
-
-    #1.Scorro la lista di Open issues+Closed issues
-    #2.Vedo per ogni valore dell'array quante volte la label è contenuta nel nome della lista di issues e mi salvo il numero in
-    #un oggetto tatisticsRepositories(stats={} con campi label e numero calcolato in cui è contenuta
-    #Se non trova etichette allora cerca nel body
-
-    stats = Statistics(pulls=stats_pulls, issues=stats_issues)
+    stats = Statistics(pulls=stats_pulls,
+                       issues=stats_issues,
+                       repositories=stats_repositories,
+                       workflows=stats_workflows)
     return stats.to_dict(), 200
 
 

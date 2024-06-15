@@ -15,25 +15,20 @@ class StatisticsWorkflows(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, daily_runs: MapStringNumber=None, type_runs: MapStringNumber=None):  # noqa: E501
+    def __init__(self, metrics: MapStringNumber=None):  # noqa: E501
         """StatisticsWorkflows - a model defined in Swagger
 
-        :param daily_runs: The daily_runs of this StatisticsWorkflows.  # noqa: E501
-        :type daily_runs: MapStringNumber
-        :param type_runs: The type_runs of this StatisticsWorkflows.  # noqa: E501
-        :type type_runs: MapStringNumber
+        :param metrics: The daily_runs of this StatisticsWorkflows.  # noqa: E501
+        :type metrics: MapStringNumber
         """
         self.swagger_types = {
-            'daily_runs': MapStringNumber,
-            'type_runs': MapStringNumber
+            'metrics': MapStringNumber
         }
 
         self.attribute_map = {
-            'daily_runs': 'dailyRuns',
-            'type_runs': 'typeRuns'
+            'metrics': 'metrics'
         }
-        self._daily_runs = daily_runs
-        self._type_runs = type_runs
+        self._metrics = metrics
 
     @classmethod
     def from_dict(cls, dikt) -> 'StatisticsWorkflows':
@@ -47,43 +42,22 @@ class StatisticsWorkflows(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def daily_runs(self) -> MapStringNumber:
-        """Gets the daily_runs of this StatisticsWorkflows.
+    def metrics(self) -> MapStringNumber:
+        """Gets the metrics of this StatisticsWorkflows.
 
 
-        :return: The daily_runs of this StatisticsWorkflows.
+        :return: The metrics of this StatisticsWorkflows.
         :rtype: MapStringNumber
         """
-        return self._daily_runs
+        return self._metrics
 
-    @daily_runs.setter
-    def daily_runs(self, daily_runs: MapStringNumber):
+    @metrics.setter
+    def metrics(self, metrics: MapStringNumber):
         """Sets the daily_runs of this StatisticsWorkflows.
 
 
-        :param daily_runs: The daily_runs of this StatisticsWorkflows.
-        :type daily_runs: MapStringNumber
+        :param metrics: The metrics of this StatisticsWorkflows.
+        :type metrics: MapStringNumber
         """
 
-        self._daily_runs = daily_runs
-
-    @property
-    def type_runs(self) -> MapStringNumber:
-        """Gets the type_runs of this StatisticsWorkflows.
-
-
-        :return: The type_runs of this StatisticsWorkflows.
-        :rtype: MapStringNumber
-        """
-        return self._type_runs
-
-    @type_runs.setter
-    def type_runs(self, type_runs: MapStringNumber):
-        """Sets the type_runs of this StatisticsWorkflows.
-
-
-        :param type_runs: The type_runs of this StatisticsWorkflows.
-        :type type_runs: MapStringNumber
-        """
-
-        self._type_runs = type_runs
+        self._metrics = metrics

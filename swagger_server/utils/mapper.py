@@ -31,7 +31,9 @@ def map_response_to_workflow(response):
         state=response.get('state'),
         created_at=util.deserialize_datetime(response['created_at']) if response.get('created_at') else None,
         updated_at=util.deserialize_datetime(response['updated_at']) if response.get('updated_at') else None,
-        file_url=response.get('html_url')  # Assuming 'html_url' contains the file URL
+        file_url=response.get('html_url'),  # Assuming 'html_url' contains the file URL
+        size=response.get('size'),
+        lines=response.get('lines')
     )
 
 

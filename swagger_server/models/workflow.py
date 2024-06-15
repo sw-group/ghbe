@@ -14,7 +14,7 @@ class Workflow(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, name: str=None, path: str=None, url: str=None, state: str=None, created_at: datetime=None, updated_at: datetime=None, file_url: str=None):  # noqa: E501
+    def __init__(self, id: int=None, name: str=None, path: str=None, url: str=None, state: str=None, created_at: datetime=None, updated_at: datetime=None, file_url: str=None, size: str=None, lines: float=None):  # noqa: E501
         """Workflow - a model defined in Swagger
 
         :param id: The id of this Workflow.  # noqa: E501
@@ -33,6 +33,10 @@ class Workflow(Model):
         :type updated_at: datetime
         :param file_url: The file_url of this Workflow.  # noqa: E501
         :type file_url: str
+        :param size: The size of this Workflow.  # noqa: E501
+        :type size: str
+        :param lines: The lines of this Workflow.  # noqa: E501
+        :type lines: float
         """
         self.swagger_types = {
             'id': int,
@@ -42,7 +46,9 @@ class Workflow(Model):
             'state': str,
             'created_at': datetime,
             'updated_at': datetime,
-            'file_url': str
+            'file_url': str,
+            'size': str,
+            'lines': float
         }
 
         self.attribute_map = {
@@ -53,7 +59,9 @@ class Workflow(Model):
             'state': 'state',
             'created_at': 'created_at',
             'updated_at': 'updated_at',
-            'file_url': 'file_url'
+            'file_url': 'file_url',
+            'size': 'size',
+            'lines': 'lines'
         }
         self._id = id
         self._name = name
@@ -63,6 +71,8 @@ class Workflow(Model):
         self._created_at = created_at
         self._updated_at = updated_at
         self._file_url = file_url
+        self._size = size
+        self._lines = lines
 
     @classmethod
     def from_dict(cls, dikt) -> 'Workflow':
@@ -242,3 +252,45 @@ class Workflow(Model):
         """
 
         self._file_url = file_url
+
+    @property
+    def size(self) -> str:
+        """Gets the size of this Workflow.
+
+
+        :return: The size of this Workflow.
+        :rtype: str
+        """
+        return self._size
+
+    @size.setter
+    def size(self, size: str):
+        """Sets the size of this Workflow.
+
+
+        :param size: The size of this Workflow.
+        :type size: str
+        """
+
+        self._size = size
+
+    @property
+    def lines(self) -> float:
+        """Gets the lines of this Workflow.
+
+
+        :return: The lines of this Workflow.
+        :rtype: float
+        """
+        return self._lines
+
+    @lines.setter
+    def lines(self, lines: float):
+        """Sets the lines of this Workflow.
+
+
+        :param lines: The lines of this Workflow.
+        :type lines: float
+        """
+
+        self._lines = lines
