@@ -153,7 +153,7 @@ def get_repository_by_full_name(owner, name):  # noqa: E501
     return r.to_dict(), 200
 
 
-def get_statistics_of_repository(owner, name, date_range=None):  # noqa: E501
+def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
     """Compute the statistics of a repository
 
     Compute the statistics of a repository # noqa: E501

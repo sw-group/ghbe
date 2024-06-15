@@ -425,7 +425,7 @@ paths:
         in: query
         description: "Filter repositories by date range (e.g., \"2023-01-01,2023-12-31\"\
           )"
-        required: false
+        required: true
         style: form
         explode: true
         schema:
