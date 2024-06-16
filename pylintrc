@@ -26,9 +26,10 @@ reports=yes
 confidence=
 
 # Disable the message, report, category or checker with the given id(s).
-disable=C0111,  # Missing docstring
-
-disable=unused-import
+disable=
+    C0111,          # Missing docstring
+    unused-import,  # unused imports
+    R0801           # duplicate code
 
 [FORMAT]
 # Maximum number of characters on a single line.
@@ -64,3 +65,7 @@ min-public-methods=0
 
 # Maximum number of boolean expressions in a if statement
 max-bool-expr=3
+
+[CLASSES]
+# List of method names used to declare (i.e. assign) instance attributes.
+defining-attr-methods=__init__,__new__,setUp
