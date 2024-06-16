@@ -671,40 +671,56 @@ components:
         type: integer
         format: int32
       example:
+        key: 0
+    Statistics_base:
+      type: object
+      properties:
+        dailyClosedProgress:
+          $ref: '#/components/schemas/MapStringNumber'
+        dailyOpenedProgress:
+          $ref: '#/components/schemas/MapStringNumber'
+      example:
+        dailyClosedProgress:
+          key: 0
+        dailyOpenedProgress:
           key: 0
     Statistics_pulls:
-      type: object
-      properties:
-        dailyClosedProgress:
-          $ref: '#/components/schemas/MapStringNumber'
-        dailyOpenedProgress:
-          $ref: '#/components/schemas/MapStringNumber'
-        merged:
-          type: integer
-          format: int32
-      example:
-        merged: 6
-        dailyClosedProgress:
-          stats:
+      allOf:
+      - $ref: '#/components/schemas/Statistics_base'
+      - type: object
+        properties:
+          merged:
+            type: integer
+            format: int32
+        example:
+          merged: 6
+          dailyClosedProgress:
+            key: 0
+          dailyOpenedProgress:
             key: 0
     Statistics_issues:
-      type: object
-      properties:
-        dailyClosedProgress:
-          $ref: '#/components/schemas/MapStringNumber'
-        dailyOpenedProgress:
-          $ref: '#/components/schemas/MapStringNumber'
-      example: {}
+      allOf:
+      - $ref: '#/components/schemas/Statistics_base'
+      - type: object
+        example:
+          dailyClosedProgress:
+            key: 0
+          dailyOpenedProgress:
+            key: 0
     Statistics_workflows:
       type: object
       properties:
         metrics:
           $ref: '#/components/schemas/MapStringNumber'
-      example: {}
+      example:
+        metrics:
+          key: 0
     Statistics_repositories:
       type: object
       properties:
         stats:
           $ref: '#/components/schemas/MapStringNumber'
-      example: {}
+      example:
+        stats:
+          key: 0
 
