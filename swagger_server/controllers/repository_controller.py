@@ -1,6 +1,3 @@
-import json
-from datetime import datetime
-
 import connexion
 import six
 from werkzeug.exceptions import NotFound
@@ -57,11 +54,13 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
     :type issue_type: str
     :param state: The state of the issues
     :type state: str
-    :param date_range: Filter repositories by date range (e.g., \&quot;2023-01-01,2023-12-31\&quot;)
+    :param date_range: Filter repositories by date range (e.g., 2023-01-01,2023-12-31)
     :type date_range: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
-    :param sort: Sort repositories by field in ascending or descending order (e.g., \&quot;field-asc\&quot; or \&quot;field-desc\&quot;). If order is not specified, default to ascending. 
+    :param sort: Sort repositories by field in ascending or descending order
+                (e.g., field-asc or field-desc).
+                If order is not specified, default to ascending.
     :type sort: str
 
     :rtype: List[Issue]
@@ -87,27 +86,29 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
 
     Retrieve repositories with filtering options # noqa: E501
 
-    :param name: Filter repositories by name. If providing a full name, prefix it with \&quot;repo:\&quot; (e.g., \&quot;repo:owner/name\&quot;). 
+    :param name: Filter repositories by name.
+                 If providing a full name, prefix it with repo: (e.g., repo:owner/name).
     :type name: str
     :param language: Filter repositories by programming language
     :type language: str
     :param is_private: Filter private repositories
     :type is_private: bool
-    :param date_range: Filter repositories by date range (e.g., \&quot;2023-01-01,2023-12-31\&quot;)
+    :param date_range: Filter repositories by date range (e.g., 2023-01-01,2023-12-31)
     :type date_range: str
-    :param stars: Filter repositories by stars range (e.g., \&quot;10,100\&quot;)
+    :param stars: Filter repositories by stars range (e.g., 10,100)
     :type stars: str
-    :param forks: Filter repositories by forks range (e.g., \&quot;5,50\&quot;)
+    :param forks: Filter repositories by forks range (e.g., 5,50)
     :type forks: str
-    :param issues: Filter repositories by issues range (e.g., \&quot;0,20\&quot;)
+    :param issues: Filter repositories by issues range (e.g., 0,20)
     :type issues: str
-    :param pulls: Filter repositories by pull requests range (e.g., \&quot;1,10\&quot;)
+    :param pulls: Filter repositories by pull requests range (e.g., 1,10)
     :type pulls: str
-    :param workflows: Filter repositories by workflows range (e.g., \&quot;1,5\&quot;)
+    :param workflows: Filter repositories by workflows range (e.g., 1,5)
     :type workflows: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
-    :param sort: Sort repositories by field in ascending or descending order (e.g., \&quot;field-asc\&quot; or \&quot;field-desc\&quot;). If order is not specified, default to ascending. 
+    :param sort: Sort repositories by field in ascending or descending order
+                (e.g., field-asc or field-desc). If order is not specified, default to ascending.
     :type sort: str
 
     :rtype: List[Repository]
@@ -162,7 +163,7 @@ def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
     :type owner: str
     :param name: The name of the repository
     :type name: str
-    :param date_range: Filter repositories by date range (e.g., \&quot;2023-01-01,2023-12-31\&quot;)
+    :param date_range: Filter repositories by date range (e.g., 2023-01-01,2023-12-31)
     :type date_range: str
 
     :rtype: Statistics
