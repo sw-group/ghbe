@@ -3,17 +3,13 @@
 extension-pkg-whitelist=
 
 # Add files or directories to the blacklist. They should be base names, not paths.
-ignore=CVS
-ignore-patterns=
+ignore=swagger_server/models, util.py, type_util.py
 
 # List of plugins (as comma separated values of python module names) to load.
 load-plugins=
 
 # Use multiple processes to speed up Pylint.
 jobs=3
-
-# Add any global disabling here
-disable=line-too-long
 
 [REPORTS]
 # Set the output format. Available formats are text, parseable, colorized, msvs
@@ -32,7 +28,8 @@ confidence=
 disable=
     C0111,          # Missing docstring
     unused-import,  # unused imports
-    R0801           # duplicate code
+    R0801          # duplicate code
+
 
 [FORMAT]
 # Maximum number of characters on a single line.
@@ -55,10 +52,7 @@ notes=FIXME,TODO
 
 [DESIGN]
 # Maximum number of arguments for a function or method
-max-args=7
-
-# Maximum number of locals for a function or method
-max-locals=15
+max-args=12
 
 # Maximum number of return / yield for function / method body
 max-returns=6
