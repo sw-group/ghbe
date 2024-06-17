@@ -6,10 +6,12 @@ from swagger_server.db.mongo_operations import MongoOperations
 from swagger_server.models import StatisticsWorkflows
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
+
 import swagger_server.db.mongo_db as db
 from swagger_server.utils.util import generate_date_count_map, generate_label_count_map, \
     generate_metrics_workflow_map
 from swagger_server.utils import mapper
+from ..models import StatisticsPulls, StatisticsIssues, StatisticsRepositories
 
 
 def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
@@ -168,35 +170,53 @@ def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
 
     :rtype: Statistics
     """
-    list_issue_open = get_issues_of_repo(owner, name, "issues", "OPEN", date_range, -1)[0]
-    list_issue_closed = get_issues_of_repo(owner, name, "issues", "CLOSED", date_range, -1)[0]
+    # Get issues and pulls data
+    issues_data = {
+        "OPEN": get_issues_of_repo(owner, name, "issues", "OPEN", date_range, -1)[0],
+        "CLOSED": get_issues_of_repo(owner, name, "issues", "CLOSED", date_range, -1)[0]
+    }
+    pulls_data = {
+        "OPEN": get_issues_of_repo(owner, name, "pulls", "OPEN", date_range, -1)[0],
+        "CLOSED": get_issues_of_repo(owner, name, "pulls", "CLOSED", date_range, -1)[0],
+        "MERGED": get_issues_of_repo(owner, name, "pulls", "MERGED", date_range, -1)[0]
+    }
 
-    list_pulls_open = get_issues_of_repo(owner, name, "pulls", "OPEN", date_range, -1)[0]
-    list_pulls_closed = get_issues_of_repo(owner, name, "pulls", "CLOSED", date_range, -1)[0]
-    list_pulls_merged = get_issues_of_repo(owner, name, "pulls", "MERGED", date_range, -1)[0]
+    # Compute statistics for issues
+    stats_issues = StatisticsIssues(
+        daily_closed_progress=generate_date_count_map(issues_data["CLOSED"]),
+        daily_opened_progress=generate_date_count_map(issues_data["OPEN"])
+    )
 
-    list_issues = list_issue_open + list_issue_closed + list_pulls_open + list_pulls_closed
+    # Compute statistics for pulls
+    stats_pulls = StatisticsPulls(
+        daily_closed_progress=generate_date_count_map(pulls_data["CLOSED"]),
+        daily_opened_progress=generate_date_count_map(pulls_data["OPEN"]),
+        merged=len(pulls_data["MERGED"])
+    )
 
-    from ..models import Statistics, StatisticsPulls, StatisticsIssues, StatisticsRepositories
+    # Combine issues and pulls data for repository statistics
+    combined_issues = issues_data["OPEN"] + issues_data["CLOSED"] + \
+                      pulls_data["OPEN"] + pulls_data["CLOSED"]
 
-    stats_issues = StatisticsIssues(daily_closed_progress=generate_date_count_map(list_issue_closed),
-                                    daily_opened_progress=generate_date_count_map(list_issue_open))
+    # Compute statistics for repositories
+    stats_repositories = StatisticsRepositories(
+        stats=generate_label_count_map(combined_issues)
+    )
 
-    stats_pulls = StatisticsPulls(daily_closed_progress=generate_date_count_map(list_pulls_closed),
-                                  daily_opened_progress=generate_date_count_map(list_pulls_open),
-                                  merged=len(list_pulls_merged)
-                                  )
+    # Compute statistics for workflows
+    workflows_data = get_workflows_of_repo(owner, name)[0]
+    stats_workflows = StatisticsWorkflows(
+        metrics=generate_metrics_workflow_map(workflows_data)
+    )
 
-    stats_repositories = StatisticsRepositories(stats=generate_label_count_map(list_issues))
+    # Aggregate all statistics into a single object
+    stats = Statistics(
+        pulls=stats_pulls,
+        issues=stats_issues,
+        repositories=stats_repositories,
+        workflows=stats_workflows
+    )
 
-    list_workflows = get_workflows_of_repo(owner, name)[0]
-
-    stats_workflows = StatisticsWorkflows(metrics=generate_metrics_workflow_map(list_workflows))
-
-    stats = Statistics(pulls=stats_pulls,
-                       issues=stats_issues,
-                       repositories=stats_repositories,
-                       workflows=stats_workflows)
     return stats.to_dict(), 200
 
 

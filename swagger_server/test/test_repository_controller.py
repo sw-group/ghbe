@@ -21,9 +21,12 @@ class TestRepositoryController(BaseTestCase):
 
         Search issues of the repo by fullname
         """
+        owner = 'owner_example'
+        name = 'name_example'
+        number = 1
         query_string = [('page', 1)]
         response = self.client.open(
-            '/ghbe/api/v1/repositories/{owner}/{name}/issues/{number}/comments'.format(owner='owner_example', name='name_example', number='number_example'),
+            f'/ghbe/api/v1/repositories/{owner}/{name}/issues/{number}/comments',
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -39,8 +42,10 @@ class TestRepositoryController(BaseTestCase):
                         ('date_range', 'date_range_example'),
                         ('page', 1),
                         ('sort', 'sort_example')]
+        owner = 'owner_example'
+        name = 'name_example'
         response = self.client.open(
-            '/ghbe/api/v1/repositories/{owner}/{name}/issues'.format(owner='owner_example', name='name_example'),
+            f'/ghbe/api/v1/repositories/{owner}/{name}/issues',
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -53,7 +58,7 @@ class TestRepositoryController(BaseTestCase):
         """
         query_string = [('name', 'name_example'),
                         ('language', 'language_example'),
-                        ('is_private', true),
+                        ('is_private', True),
                         ('date_range', 'date_range_example'),
                         ('stars', 'stars_example'),
                         ('forks', 'forks_example'),
@@ -74,8 +79,10 @@ class TestRepositoryController(BaseTestCase):
 
         Search repositories by filter
         """
+        owner = 'owner_example'
+        name = 'name_example'
         response = self.client.open(
-            '/ghbe/api/v1/repositories/{owner}/{name}'.format(owner='owner_example', name='name_example'),
+            f'/ghbe/api/v1/repositories/{owner}/{name}',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -86,8 +93,10 @@ class TestRepositoryController(BaseTestCase):
         Compute the statistics of a repository
         """
         query_string = [('date_range', 'date_range_example')]
+        owner = 'owner_example'
+        name = 'name_example'
         response = self.client.open(
-            '/ghbe/api/v1/repositories/{owner}/{name}/statistics'.format(owner='owner_example', name='name_example'),
+            f'/ghbe/api/v1/repositories/{owner}/{name}/statistics',
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -98,8 +107,10 @@ class TestRepositoryController(BaseTestCase):
 
         Search workflows of the repo by fullname
         """
+        owner = 'owner_example'
+        name = 'name_example'
         response = self.client.open(
-            '/ghbe/api/v1/repositories/{owner}/{name}/workflows'.format(owner='owner_example', name='name_example'),
+            f'/ghbe/api/v1/repositories/{owner}/{name}/workflows',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

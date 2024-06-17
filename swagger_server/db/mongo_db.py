@@ -38,7 +38,7 @@ collection_prs = db["pullRequests"]
 collection_workflows = db["workflows"]
 
 #######################################################################
-''' METHOD COLLECTION REPOSITORY '''
+# METHOD COLLECTION REPOSITORY
 
 def exist_repository(key):
     result = collection_repo.find_one({"_id": key})
@@ -51,7 +51,7 @@ def get_repository_by_id(key):
 
 #######################################################################
 
-''' METHOD COLLECTION ISSUE '''
+# METHOD COLLECTION ISSUE
 
 def get_repository_issues(key):
     return collection_issues.find({"_id": key})
@@ -59,7 +59,7 @@ def get_repository_issues(key):
 
 #######################################################################
 
-''' METHOD COLLECTION PULLREQUEST '''
+# METHOD COLLECTION PULLREQUEST
 
 def get_repository_prs(key):
     return collection_prs.find_one({"_id": key})
@@ -67,11 +67,7 @@ def get_repository_prs(key):
 
 #############################################################
 
-''' METHOD COLLECTION WORKFLOWS '''
+# METHOD COLLECTION WORKFLOWS
 
 def get_repository_workflow(key):
     return collection_workflows.find_one({"_id": key})
-
-
-def get_repository_workflow_by_id(key, id):
-    return collection_workflows.find_one({"_id": key}, {"workflows": {"$elemMatch": {"id": id}}})

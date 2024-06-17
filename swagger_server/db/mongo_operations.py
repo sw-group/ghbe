@@ -1,6 +1,5 @@
-from pymongo import MongoClient
 from datetime import datetime
-
+from pymongo import MongoClient
 
 class MongoOperations:
     def __init__(self, db_name='mining', collection_name='repositories', uri='mongodb://localhost:27017/'):
@@ -93,7 +92,7 @@ class MongoOperations:
             cursor = self.collection.find(query).sort(field, sort_order)
         else:
             cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
-        print(query)
+
         issues = list(cursor)
         return issues
 
