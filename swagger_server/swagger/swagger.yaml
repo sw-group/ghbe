@@ -33,8 +33,7 @@ paths:
         in: query
         description: |
           Filter repositories by name. 
-          If providing a full name, prefix it with <repo:> (e.g., repo:owner/name). 
-          # pylint: disable=line-too-long
+          If providing a full name, prefix it with repo: (e.g., repo:owner/name).
         required: false
         style: form
         explode: true
@@ -127,7 +126,6 @@ paths:
           Sort repositories by field in ascending or descending order 
           (e.g., field-asc or field-desc).
           If order is not specified, default to ascending.
-          # pylint: disable=line-too-long
         required: false
         style: form
         explode: true
@@ -311,7 +309,6 @@ paths:
           Sort repositories by field in ascending or descending order 
           (e.g., field-asc or field-desc).
           If order is not specified, default to ascending.
-          # pylint: disable=line-too-long
         required: false
         style: form
         explode: true
