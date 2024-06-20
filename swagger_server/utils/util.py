@@ -117,3 +117,15 @@ def __accumulate_dict_values(target, source):
     for key, value in source.items():
         target.setdefault(key, 0)
         target[key] += value
+
+def validate_date_range(date_range):
+    from datetime import datetime
+    try:
+        start_date_str, end_date_str = date_range.split(',')
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+        if (end_date - start_date).days > 31:
+            return "dateRange cannot exceed 30 days"
+        return None
+    except ValueError:
+        return "Invalid dateRange format"

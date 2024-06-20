@@ -9,7 +9,7 @@ class MongoOperations:
         self.collection = self.db[collection_name]
 
     def get_repositories(self, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
-                         issues=None, pulls=None, workflows=None, page=1, sort=None):
+                         issues=None, pulls=None, workflows=None, page=None, sort=None):
         query = {}
 
         if name:

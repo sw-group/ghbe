@@ -1,19 +1,14 @@
-from datetime import datetime
-
-import connexion
-import six
 from flask import jsonify
 from werkzeug.exceptions import NotFound
 
+import swagger_server.db.mongo_db as db
 from swagger_server.db.mongo_operations import MongoOperations
 from swagger_server.models import StatisticsWorkflows
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
-
-import swagger_server.db.mongo_db as db
-from swagger_server.utils.util import generate_date_count_map, generate_label_count_map, \
-    generate_metrics_workflow_map, accumulate_stats
 from swagger_server.utils import mapper
+from swagger_server.utils.util import generate_date_count_map, generate_label_count_map, \
+    generate_metrics_workflow_map, accumulate_stats, validate_date_range
 from ..models import StatisticsPulls, StatisticsIssues, StatisticsRepositories
 
 
@@ -155,8 +150,8 @@ def get_repository_by_full_name(owner, name):  # noqa: E501
         raise NotFound
 
     # map the json into Repository model
-    r = mapper.map_response_to_repository(repo)
-    return r.to_dict(), 200
+    r = mapper.map_response_to_repository(repo).to_dict()
+    return r, 200
 
 
 def get_workflows_of_repo(owner, name):  # noqa: E501
@@ -192,7 +187,7 @@ def get_statistics(date_range, name=None, language=None, is_private=None, stars=
     """Compute the statistics of all the filtered repositories
 
     Compute the statistics of all the filtered repositories.
-    If you will not insert any filter the statistich will realize on every field.    # noqa: E501
+    If you want not insert any filter the statistic will realize on every field.    # noqa: E501
 
     :param date_range: Filter repositories by date range (e.g., 2023-01-01,2023-12-31)
     :type date_range: str
@@ -216,34 +211,14 @@ def get_statistics(date_range, name=None, language=None, is_private=None, stars=
 
     :rtype: Statistics
     """
-    if date_range:
-        try:
-            start_date_str, end_date_str = date_range.split(',')
-            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-            if (end_date - start_date).days > 31:
-                return jsonify({"error": "dateRange cannot exceed 30 days"}), 400
-        except ValueError:
-            return jsonify({"error": "Invalid dateRange format"}), 400
+    error_message = validate_date_range(date_range)
+    if error_message:
+        return jsonify({"error": error_message}), 400
 
     list_repo = get_repositories(name, language, is_private, date_range, stars, forks, issues,
                                  pulls, workflows, -1)[0]
 
-    # Initialize a Statistics object
-    stats = Statistics(StatisticsPulls(), StatisticsIssues(), StatisticsWorkflows(), StatisticsRepositories()).to_dict()
-
-    # Iterate over each repository
-    for repo in list_repo:
-        # Get statistics for the current repository
-        full_name = repo['full_name']
-        owner, name = full_name.split('/')
-        stats_issues, stats_pulls, stats_workflows, stats_repositories = (
-            __get_stats(owner, name, date_range))
-
-        # Accumulate statistics into the main stats object using the standalone function
-        accumulate_stats(stats, stats_issues, stats_pulls, stats_workflows, stats_repositories)
-
-    return stats, 200
+    return __compute_stats(list_repo, date_range), 200
 
 
 def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
@@ -260,27 +235,30 @@ def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
 
     :rtype: Statistics
     """
-    if date_range:
-        try:
-            start_date_str, end_date_str = date_range.split(',')
-            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-            if (end_date - start_date).days > 31:
-                return jsonify({"error": "dateRange cannot exceed 30 days"}), 400
-        except ValueError:
-            return jsonify({"error": "Invalid dateRange format"}), 400
+    error_message = validate_date_range(date_range)
+    if error_message:
+        return jsonify({"error": error_message}), 400
 
-    stats_issues, stats_pulls, stats_workflows, stats_repositories = __get_stats(owner, name, date_range)
+    repo = get_repository_by_full_name(owner, name)[0]
 
-    # Aggregate all statistics into a single object
-    stats = Statistics(
-        pulls=stats_pulls,
-        issues=stats_issues,
-        repositories=stats_repositories,
-        workflows=stats_workflows
-    )
+    return __compute_stats([repo], date_range), 200
 
-    return stats.to_dict(), 200
+
+def __compute_stats(repos, date_range):
+    # Initialize a Statistics object
+    stats = Statistics(StatisticsPulls(), StatisticsIssues(), StatisticsWorkflows(), StatisticsRepositories()).to_dict()
+
+    # Iterate over each repository
+    for repo in repos:
+        # Get statistics for the current repository
+        owner, r_name = repo['full_name'].split('/')
+        stats_issues, stats_pulls, stats_workflows, stats_repositories = (
+            __get_stats(owner, r_name, date_range))
+
+        # Accumulate statistics into the main stats object using the standalone function
+        accumulate_stats(stats, stats_issues, stats_pulls, stats_workflows, stats_repositories)
+
+    return stats
 
 
 def __get_stats(owner, name, date_range):

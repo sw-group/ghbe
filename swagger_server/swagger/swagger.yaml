@@ -396,14 +396,14 @@ paths:
         "500":
           description: Internal Server Error
       x-openapi-router-controller: swagger_server.controllers.repository_controller
-  /repositories/stats:
+  /repositories/statistics:
     get:
       tags:
       - repository
       summary:  Compute the statistics of all the filtered repositories
       description: |
         Compute the statistics of all the filtered repositories. 
-        If you will not insert any filter the statistich will realize on every field.
+        If you want not insert any filter the statistic will realize on every field.
       operationId: get_statistics
       parameters:
       - name: name
