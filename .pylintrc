@@ -13,8 +13,7 @@ jobs=3
 
 [REPORTS]
 # Set the output format. Available formats are text, parseable, colorized, msvs
-# (visual studio) and html. You can also give a reporter class, eg
-# mypackage.mymodule.MyReporterClass.
+# (visual studio) and html.
 output-format=parseable
 
 # Tells whether to display a full report or only the messages
@@ -28,8 +27,7 @@ confidence=
 disable=
     C0111,          # Missing docstring
     unused-import,  # unused imports
-    R0801          # duplicate code
-
+    R0801           # duplicate code
 
 [FORMAT]
 # Maximum number of characters on a single line.
