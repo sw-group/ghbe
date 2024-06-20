@@ -87,6 +87,27 @@ class TestRepositoryController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_get_statistics(self):
+        """Test case for get_statistics
+
+        Compute the statistics of all the filtered repositories
+        """
+        query_string = [('name', 'name_example'),
+                        ('language', 'language_example'),
+                        ('is_private', True),
+                        ('date_range', 'date_range_example'),
+                        ('stars', 'stars_example'),
+                        ('forks', 'forks_example'),
+                        ('issues', 'issues_example'),
+                        ('pulls', 'pulls_example'),
+                        ('workflows', 'workflows_example')]
+        response = self.client.open(
+            '/ghbe/api/v1/repositories/stats',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_statistics_of_repository(self):
         """Test case for get_statistics_of_repository
 

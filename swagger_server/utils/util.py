@@ -74,8 +74,46 @@ def generate_metrics_workflow_map(workflows):
     label_count_map["size"] = float(format(mean_size_bytes, ".2f"))
     return label_count_map
 
+
 def convert_size_to_bytes(size_str):
     multipliers = {'Bytes': 1, 'KB': 1024, 'MB': 1024 ** 2, 'GB': 1024 ** 3}
     size_str = size_str.strip()
     num, unit = size_str.split()
     return float(num) * multipliers[unit]
+
+
+def accumulate_stats(stats, stats_issues, stats_pulls, stats_workflows, stats_repositories):
+    # Initialize nested dictionaries if they are None
+    __initialize_nested_dict(stats['issues'], 'daily_closed_progress', {})
+    __initialize_nested_dict(stats['issues'], 'daily_opened_progress', {})
+    __initialize_nested_dict(stats['pulls'], 'daily_closed_progress', {})
+    __initialize_nested_dict(stats['pulls'], 'daily_opened_progress', {})
+    __initialize_nested_dict(stats['pulls'], 'merged', 0)
+    __initialize_nested_dict(stats['workflows'], 'metrics', {})
+    __initialize_nested_dict(stats['repositories'], 'stats', {})
+
+    # Accumulate issues
+    __accumulate_dict_values(stats['issues']['daily_closed_progress'], stats_issues.daily_closed_progress)
+    __accumulate_dict_values(stats['issues']['daily_opened_progress'], stats_issues.daily_opened_progress)
+
+    # Accumulate pull requests
+    __accumulate_dict_values(stats['pulls']['daily_closed_progress'], stats_pulls.daily_closed_progress)
+    __accumulate_dict_values(stats['pulls']['daily_opened_progress'], stats_pulls.daily_opened_progress)
+    stats['pulls']['merged'] += stats_pulls.merged
+
+    # Accumulate workflows
+    __accumulate_dict_values(stats['workflows']['metrics'], stats_workflows.metrics)
+
+    # Accumulate repositories stats
+    __accumulate_dict_values(stats['repositories']['stats'], stats_repositories.stats)
+
+
+def __initialize_nested_dict(d, key, default):
+    if d.get(key) is None:
+        d[key] = default
+
+
+def __accumulate_dict_values(target, source):
+    for key, value in source.items():
+        target.setdefault(key, 0)
+        target[key] += value

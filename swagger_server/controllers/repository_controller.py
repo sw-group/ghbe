@@ -1,5 +1,8 @@
+from datetime import datetime
+
 import connexion
 import six
+from flask import jsonify
 from werkzeug.exceptions import NotFound
 
 from swagger_server.db.mongo_operations import MongoOperations
@@ -9,7 +12,7 @@ from swagger_server.models.statistics import Statistics  # noqa: E501
 
 import swagger_server.db.mongo_db as db
 from swagger_server.utils.util import generate_date_count_map, generate_label_count_map, \
-    generate_metrics_workflow_map
+    generate_metrics_workflow_map, accumulate_stats
 from swagger_server.utils import mapper
 from ..models import StatisticsPulls, StatisticsIssues, StatisticsRepositories
 
@@ -156,6 +159,93 @@ def get_repository_by_full_name(owner, name):  # noqa: E501
     return r.to_dict(), 200
 
 
+def get_workflows_of_repo(owner, name):  # noqa: E501
+    """Search workflows of the repo by fullname
+
+    Search workflows of the repo by fullname # noqa: E501
+
+    :param owner: The owner of the repository
+    :type owner: str
+    :param name: The name of the repository
+    :type name: str
+
+    :rtype: List[Workflow]
+    """
+    repo_full_name = f"{owner}/{name}"
+
+    if not db.exist_repository(repo_full_name):
+        raise NotFound
+
+    workflows_from_db = db.get_repository_workflow(repo_full_name)
+
+    # List to store Workflow instances
+    workflows = [
+        mapper.map_response_to_workflow(workflow).to_dict()
+        for workflow in workflows_from_db.get('workflows', [])
+    ]
+
+    return workflows, 200
+
+
+def get_statistics(date_range, name=None, language=None, is_private=None, stars=None, forks=None, issues=None,
+                   pulls=None, workflows=None):  # noqa: E501
+    """Compute the statistics of all the filtered repositories
+
+    Compute the statistics of all the filtered repositories.
+    If you will not insert any filter the statistich will realize on every field.    # noqa: E501
+
+    :param date_range: Filter repositories by date range (e.g., 2023-01-01,2023-12-31)
+    :type date_range: str
+    :param name: Filter repositories by name.
+                 If providing a full name, prefix it with repo: (e.g., repo:owner/name).
+    :type name: str
+    :param language: Filter repositories by programming language
+    :type language: str
+    :param is_private: Filter private repositories
+    :type is_private: bool
+    :param stars: Filter repositories by stars range (e.g., 10,100)
+    :type stars: str
+    :param forks: Filter repositories by forks range (e.g., 5,50)
+    :type forks: str
+    :param issues: Filter repositories by issues range (e.g., 0,20)
+    :type issues: str
+    :param pulls: Filter repositories by pull requests range (e.g., 1,10)
+    :type pulls: str
+    :param workflows: Filter repositories by workflows range (e.g., 1,5)
+    :type workflows: str
+
+    :rtype: Statistics
+    """
+    if date_range:
+        try:
+            start_date_str, end_date_str = date_range.split(',')
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+            if (end_date - start_date).days > 31:
+                return jsonify({"error": "dateRange cannot exceed 30 days"}), 400
+        except ValueError:
+            return jsonify({"error": "Invalid dateRange format"}), 400
+
+    list_repo = get_repositories(name, language, is_private, date_range, stars, forks, issues,
+                                 pulls, workflows, -1)[0]
+
+    # Initialize a Statistics object
+    stats = Statistics(StatisticsPulls(), StatisticsIssues(), StatisticsWorkflows(), StatisticsRepositories()).to_dict()
+
+    # Iterate over each repository
+    for repo in list_repo:
+        # Get statistics for the current repository
+        full_name = repo['full_name']
+        owner, name = full_name.split('/')
+        stats_issues, stats_pulls, stats_workflows, stats_repositories = (
+            __get_stats(owner, name, date_range))
+
+        # Accumulate statistics into the main stats object using the standalone function
+        accumulate_stats(stats, stats_issues, stats_pulls, stats_workflows, stats_repositories)
+
+    return stats, 200
+
+
 def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
     """Compute the statistics of a repository
 
@@ -170,11 +260,36 @@ def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
 
     :rtype: Statistics
     """
+    if date_range:
+        try:
+            start_date_str, end_date_str = date_range.split(',')
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+            if (end_date - start_date).days > 31:
+                return jsonify({"error": "dateRange cannot exceed 30 days"}), 400
+        except ValueError:
+            return jsonify({"error": "Invalid dateRange format"}), 400
+
+    stats_issues, stats_pulls, stats_workflows, stats_repositories = __get_stats(owner, name, date_range)
+
+    # Aggregate all statistics into a single object
+    stats = Statistics(
+        pulls=stats_pulls,
+        issues=stats_issues,
+        repositories=stats_repositories,
+        workflows=stats_workflows
+    )
+
+    return stats.to_dict(), 200
+
+
+def __get_stats(owner, name, date_range):
     # Get issues and pulls data
     issues_data = {
         "OPEN": get_issues_of_repo(owner, name, "issues", "OPEN", date_range, -1)[0],
         "CLOSED": get_issues_of_repo(owner, name, "issues", "CLOSED", date_range, -1)[0]
     }
+
     pulls_data = {
         "OPEN": get_issues_of_repo(owner, name, "pulls", "OPEN", date_range, -1)[0],
         "CLOSED": get_issues_of_repo(owner, name, "pulls", "CLOSED", date_range, -1)[0],
@@ -209,40 +324,4 @@ def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
         metrics=generate_metrics_workflow_map(workflows_data)
     )
 
-    # Aggregate all statistics into a single object
-    stats = Statistics(
-        pulls=stats_pulls,
-        issues=stats_issues,
-        repositories=stats_repositories,
-        workflows=stats_workflows
-    )
-
-    return stats.to_dict(), 200
-
-
-def get_workflows_of_repo(owner, name):  # noqa: E501
-    """Search workflows of the repo by fullname
-
-    Search workflows of the repo by fullname # noqa: E501
-
-    :param owner: The owner of the repository
-    :type owner: str
-    :param name: The name of the repository
-    :type name: str
-
-    :rtype: List[Workflow]
-    """
-    repo_full_name = f"{owner}/{name}"
-
-    if not db.exist_repository(repo_full_name):
-        raise NotFound
-
-    workflows_from_db = db.get_repository_workflow(repo_full_name)
-
-    # List to store Workflow instances
-    workflows = [
-        mapper.map_response_to_workflow(workflow).to_dict()
-        for workflow in workflows_from_db.get('workflows', [])
-    ]
-
-    return workflows, 200
+    return stats_issues, stats_pulls, stats_workflows, stats_repositories

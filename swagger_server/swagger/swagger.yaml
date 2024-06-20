@@ -396,6 +396,111 @@ paths:
         "500":
           description: Internal Server Error
       x-openapi-router-controller: swagger_server.controllers.repository_controller
+  /repositories/stats:
+    get:
+      tags:
+      - repository
+      summary:  Compute the statistics of all the filtered repositories
+      description: |
+        Compute the statistics of all the filtered repositories. 
+        If you will not insert any filter the statistich will realize on every field.
+      operationId: get_statistics
+      parameters:
+      - name: name
+        in: query
+        description: |
+          Filter repositories by name. If providing a full name, prefix it with repo: (e.g., repo:owner/name).
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^(repo:[\\w-]+/[\\w-]+|[\\w-]+)$"
+          type: string
+      - name: language
+        in: query
+        description: Filter repositories by programming language
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: isPrivate
+        in: query
+        description: Filter private repositories
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: dateRange
+        in: query
+        description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
+        required: true
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+          type: string
+      - name: stars
+        in: query
+        description: "Filter repositories by stars range (e.g., 10,100)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: forks
+        in: query
+        description: "Filter repositories by forks range (e.g., 5,50)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: issues
+        in: query
+        description: "Filter repositories by issues range (e.g., 0,20)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: pulls
+        in: query
+        description: "Filter repositories by pull requests range (e.g., 1,10)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: workflows
+        in: query
+        description: "Filter repositories by workflows range (e.g., 1,5)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+              x-content-type: application/json
+        "400":
+          description: Bad Request
+        "422":
+          description: Validation exception
+        "500":
+          description: Internal Server Error
+      x-openapi-router-controller: swagger_server.controllers.repository_controller
   /repositories/{owner}/{name}/statistics:
     get:
       tags:

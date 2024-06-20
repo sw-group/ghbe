@@ -1,6 +1,7 @@
 from datetime import datetime
 from pymongo import MongoClient
 
+
 class MongoOperations:
     def __init__(self, db_name='mining', collection_name='repositories', uri='mongodb://localhost:27017/'):
         self.client = MongoClient(uri)
@@ -22,9 +23,11 @@ class MongoOperations:
 
         if date_range:
             start_date, end_date = date_range.split(',')
+            s_date = datetime.strptime(start_date, '%Y-%m-%d')
+            e_date = datetime.combine(datetime.strptime(end_date, '%Y-%m-%d').date(), datetime.max.time())
             query['data.updated_at'] = {
-                '$gte': datetime.strptime(start_date, '%Y-%m-%d').isoformat(),
-                '$lte': datetime.strptime(end_date, '%Y-%m-%d').isoformat()
+                '$gte': s_date.isoformat(),  # Start of the filter_date
+                '$lt': e_date.isoformat()  # End of the filter_date
             }
 
         if stars:
@@ -59,7 +62,10 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+        if page == -1:
+            cursor = self.collection.find(query).sort(field, sort_order)
+        else:
+            cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
 
         repositories = list(cursor)
         return repositories
@@ -71,9 +77,11 @@ class MongoOperations:
             query['state'] = state.upper()
         if date_range:
             start_date, end_date = date_range.split(',')
+            s_date = datetime.strptime(start_date, '%Y-%m-%d')
+            e_date = datetime.combine(datetime.strptime(end_date, '%Y-%m-%d').date(), datetime.max.time())
             query['updatedAt'] = {
-                '$gte': datetime.strptime(start_date, '%Y-%m-%d').isoformat(),
-                '$lte': datetime.strptime(end_date, '%Y-%m-%d').isoformat()
+                '$gte': s_date.isoformat(),  # Start of the filter_date
+                '$lt': e_date.isoformat()  # End of the filter_date
             }
 
         # Sorting (1 = asc; -1 = desc)
