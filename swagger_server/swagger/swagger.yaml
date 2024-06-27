@@ -110,6 +110,15 @@ paths:
         schema:
           pattern: "^\\d+,\\d+$"
           type: string
+      - name: watchers
+        in: query
+        description: "Filter repositories by watchers range (e.g., 1,20)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
       - name: page
         in: query
         description: Specify the page number for paginated results (default is 1)
@@ -480,6 +489,15 @@ paths:
       - name: workflows
         in: query
         description: "Filter repositories by workflows range (e.g., 1,5)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d+,\\d+$"
+          type: string
+      - name: watchers
+        in: query
+        description: "Filter repositories by watchers range (e.g., 1,20)"
         required: false
         style: form
         explode: true

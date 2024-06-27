@@ -81,7 +81,7 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
 
 
 def get_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None, issues=None,
-                     pulls=None, workflows=None, page=None, sort=None):  # noqa: E501
+                     pulls=None, workflows=None, watchers=None, page=None, sort=None):  # noqa: E501
     """Retrieve repositories with filtering options
 
     Retrieve repositories with filtering options # noqa: E501
@@ -118,7 +118,7 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
     try:
         repositories_data = mongo_ops.get_repositories(name=name, language=language, is_private=is_private,
                                                        date_range=date_range, stars=stars, forks=forks, issues=issues,
-                                                       pulls=pulls, workflows=workflows, page=page, sort=sort)
+                                                       pulls=pulls, workflows=workflows, watchers=watchers, page=page, sort=sort)
 
         repositories = [
             mapper.map_response_to_repository(repo).to_dict()
@@ -183,7 +183,7 @@ def get_workflows_of_repo(owner, name):  # noqa: E501
 
 
 def get_statistics(date_range, name=None, language=None, is_private=None, stars=None, forks=None, issues=None,
-                   pulls=None, workflows=None):  # noqa: E501
+                   pulls=None, workflows=None, watchers=None):  # noqa: E501
     """Compute the statistics of all the filtered repositories
 
     Compute the statistics of all the filtered repositories.
@@ -216,7 +216,7 @@ def get_statistics(date_range, name=None, language=None, is_private=None, stars=
         return jsonify({"error": error_message}), 400
 
     list_repo = get_repositories(name, language, is_private, date_range, stars, forks, issues,
-                                 pulls, workflows, -1)[0]
+                                 pulls, workflows, watchers, -1)[0]
 
     return __compute_stats(list_repo, date_range), 200
 

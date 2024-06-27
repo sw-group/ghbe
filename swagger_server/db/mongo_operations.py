@@ -9,7 +9,7 @@ class MongoOperations:
         self.collection = self.db[collection_name]
 
     def get_repositories(self, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
-                         issues=None, pulls=None, workflows=None, page=None, sort=None):
+                         issues=None, pulls=None, workflows=None, watchers=None, page=None, sort=None):
         query = {}
 
         if name:
@@ -18,7 +18,7 @@ class MongoOperations:
         if language:
             query['data.language'] = language
 
-        if is_private:
+        if is_private is not None:
             query['data.private'] = is_private
 
         if date_range:
@@ -49,6 +49,10 @@ class MongoOperations:
         if workflows:
             min_workflows, max_workflows = workflows.split(',')
             query['data.workflows_count'] = {'$gte': int(min_workflows), '$lte': int(max_workflows)}
+
+        if watchers:
+            min_watchers, max_watchers = watchers.split(',')
+            query['data.watchers_count'] = {'$gte': int(min_watchers), '$lte': int(max_watchers)}
 
         # Sorting (1 = asc; -1 = desc)
         sort_order = -1
