@@ -1,3 +1,5 @@
+from swagger_server.models.metrics import Metrics
+
 
 def generate_date_count_map(issue_list):
     from collections import defaultdict
@@ -129,3 +131,31 @@ def validate_date_range(date_range):
         return None
     except ValueError:
         return "Invalid dateRange format"
+
+
+# Function to extract required information
+def process_repositories(repos):
+    languages = set()
+    maxes = {
+        'stars_count': 0,
+        'watchers_count': 0,
+        'forks_count': 0,
+        'issue_count': 0,
+        'pull_request_count': 0,
+        'workflows_count': 0
+    }
+
+    for repo in repos:
+        data = repo['data']
+        languages.add(data['language'])
+
+        for key in maxes.keys():
+            if data[key] > maxes[key]:
+                maxes[key] = data[key]
+
+    result = Metrics(
+        languages=list(languages),
+        maxes=maxes
+    ).to_dict()
+
+    return result

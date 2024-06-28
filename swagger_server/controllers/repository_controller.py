@@ -105,6 +105,8 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
     :type pulls: str
     :param workflows: Filter repositories by workflows range (e.g., 1,5)
     :type workflows: str
+    :param watchers: Filter repositories by watchers range (e.g., 1,5)
+    :type watchers: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
     :param sort: Sort repositories by field in ascending or descending order
@@ -118,7 +120,8 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
     try:
         repositories_data = mongo_ops.get_repositories(name=name, language=language, is_private=is_private,
                                                        date_range=date_range, stars=stars, forks=forks, issues=issues,
-                                                       pulls=pulls, workflows=workflows, watchers=watchers, page=page, sort=sort)
+                                                       pulls=pulls, workflows=workflows, watchers=watchers, page=page,
+                                                       sort=sort)
 
         repositories = [
             mapper.map_response_to_repository(repo).to_dict()
@@ -208,6 +211,8 @@ def get_statistics(date_range, name=None, language=None, is_private=None, stars=
     :type pulls: str
     :param workflows: Filter repositories by workflows range (e.g., 1,5)
     :type workflows: str
+    :param watchers: Filter repositories by watchers range (e.g., 1,5)
+    :type watchers: str
 
     :rtype: Statistics
     """

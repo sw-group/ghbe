@@ -65,6 +65,7 @@ class TestRepositoryController(BaseTestCase):
                         ('issues', 'issues_example'),
                         ('pulls', 'pulls_example'),
                         ('workflows', 'workflows_example'),
+                        ('watchers', 'watchers_example'),
                         ('page', 1),
                         ('sort', 'sort_example')]
         response = self.client.open(
@@ -100,9 +101,10 @@ class TestRepositoryController(BaseTestCase):
                         ('forks', 'forks_example'),
                         ('issues', 'issues_example'),
                         ('pulls', 'pulls_example'),
-                        ('workflows', 'workflows_example')]
+                        ('workflows', 'workflows_example'),
+                        ('watchers', 'watchers_example')]
         response = self.client.open(
-            '/ghbe/api/v1/repositories/stats',
+            '/ghbe/api/v1/repositories/statistics',
             method='GET',
             query_string=query_string)
         self.assert200(response,
