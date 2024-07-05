@@ -6,7 +6,6 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.map_string_number import MapStringNumber  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,14 +14,14 @@ class StatisticsRepositories(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, stats: MapStringNumber=None):  # noqa: E501
+    def __init__(self, stats: Dict[str, int]=None):  # noqa: E501
         """StatisticsRepositories - a model defined in Swagger
 
         :param stats: The stats of this StatisticsRepositories.  # noqa: E501
-        :type stats: MapStringNumber
+        :type stats: Dict[str, int]
         """
         self.swagger_types = {
-            'stats': MapStringNumber
+            'stats': Dict[str, int]
         }
 
         self.attribute_map = {
@@ -42,22 +41,22 @@ class StatisticsRepositories(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def stats(self) -> MapStringNumber:
+    def stats(self) -> Dict[str, int]:
         """Gets the stats of this StatisticsRepositories.
 
 
         :return: The stats of this StatisticsRepositories.
-        :rtype: MapStringNumber
+        :rtype: Dict[str, int]
         """
         return self._stats
 
     @stats.setter
-    def stats(self, stats: MapStringNumber):
+    def stats(self, stats: Dict[str, int]):
         """Sets the stats of this StatisticsRepositories.
 
 
         :param stats: The stats of this StatisticsRepositories.
-        :type stats: MapStringNumber
+        :type stats: Dict[str, int]
         """
 
         self._stats = stats

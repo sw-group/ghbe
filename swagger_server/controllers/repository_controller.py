@@ -2,14 +2,16 @@ from flask import jsonify
 from werkzeug.exceptions import NotFound
 
 import swagger_server.db.mongo_db as db
+from swagger_server.business import business
 from swagger_server.db.mongo_operations import MongoOperations
-from swagger_server.models import StatisticsWorkflows
+from swagger_server.models import RepositoriesList, IssuesList
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
 from swagger_server.utils import mapper
 from swagger_server.utils.util import generate_date_count_map, generate_label_count_map, \
     generate_metrics_workflow_map, accumulate_stats, validate_date_range
-from ..models import StatisticsPulls, StatisticsIssues, StatisticsRepositories
+from swagger_server.models import StatisticsIssues, StatisticsPulls, StatisticsRepositories, StatisticsWorkflows
+from typing import Tuple
 
 
 def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
@@ -26,7 +28,7 @@ def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
 
-    :rtype: List[Comment]
+    :rtype: CommentsList
     """
     repo_full_name = f'{owner}/{name}'
     mongo_ops = MongoOperations(collection_name="comments")
@@ -58,26 +60,14 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
     :type date_range: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
-    :param sort: Sort repositories by field in ascending or descending order
-                (e.g., field-asc or field-desc).
-                If order is not specified, default to ascending.
+    :param sort: Sort repositories by field in ascending or descending order  (e.g., field-asc or field-desc). If order is not specified, default to ascending. 
     :type sort: str
 
-    :rtype: List[Issue]
+    :rtype: IssuesList
     """
 
     repo_full_name = f'{owner}/{name}'
-    mongo_ops = MongoOperations(collection_name=("issues" if issue_type == "issues" else "pullRequests"))
-    try:
-        issues_data = mongo_ops.get_issues(repo=repo_full_name, state=state, date_range=date_range, page=page,
-                                           sort=sort)
-        issues = [
-            mapper.map_response_to_issue(issue).to_dict()
-            for issue in issues_data
-        ]
-        return issues, 200
-    finally:
-        mongo_ops.close()
+    return business.elaborate_issues(repo_full_name, issue_type, state, date_range, page, sort).to_dict()
 
 
 def get_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None, issues=None,
@@ -86,8 +76,7 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
 
     Retrieve repositories with filtering options # noqa: E501
 
-    :param name: Filter repositories by name.
-                 If providing a full name, prefix it with repo: (e.g., repo:owner/name).
+    :param name: Filter repositories by name.  If providing a full name, prefix it with repo: (e.g., repo:owner/name). 
     :type name: str
     :param language: Filter repositories by programming language
     :type language: str
@@ -105,15 +94,14 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
     :type pulls: str
     :param workflows: Filter repositories by workflows range (e.g., 1,5)
     :type workflows: str
-    :param watchers: Filter repositories by watchers range (e.g., 1,5)
+    :param watchers: Filter repositories by watchers range (e.g., 1,20)
     :type watchers: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
-    :param sort: Sort repositories by field in ascending or descending order
-                (e.g., field-asc or field-desc). If order is not specified, default to ascending.
+    :param sort: Sort repositories by field in ascending or descending order  (e.g., field-asc or field-desc). If order is not specified, default to ascending. 
     :type sort: str
 
-    :rtype: List[Repository]
+    :rtype: RepositoriesList
     """
 
     mongo_ops = MongoOperations()
@@ -123,11 +111,17 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
                                                        pulls=pulls, workflows=workflows, watchers=watchers, page=page,
                                                        sort=sort)
 
+        total = mongo_ops.count_repositories(name=name, language=language, is_private=is_private,
+                                             date_range=date_range, stars=stars, forks=forks, issues=issues,
+                                             pulls=pulls, workflows=workflows, watchers=watchers)
+
         repositories = [
-            mapper.map_response_to_repository(repo).to_dict()
+            mapper.map_response_to_repository(repo)
             for repo in repositories_data
         ]
-        return repositories, 200
+
+        response = RepositoriesList(items=repositories, total_elements=total, page=page).to_dict()
+        return response, 200
     finally:
         mongo_ops.close()
 
@@ -220,10 +214,10 @@ def get_statistics(date_range, name=None, language=None, is_private=None, stars=
     if error_message:
         return jsonify({"error": error_message}), 400
 
-    list_repo = get_repositories(name, language, is_private, date_range, stars, forks, issues,
-                                 pulls, workflows, watchers, -1)[0]
+    repositories_response, status_code = get_repositories(name, language, is_private, date_range, stars, forks, issues,
+                                                          pulls, workflows, watchers, -1)
 
-    return __compute_stats(list_repo, date_range), 200
+    return __compute_stats(repositories_response["items"], date_range), 200
 
 
 def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
@@ -251,32 +245,41 @@ def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
 
 def __compute_stats(repos, date_range):
     # Initialize a Statistics object
-    stats = Statistics(StatisticsPulls(), StatisticsIssues(), StatisticsWorkflows(), StatisticsRepositories()).to_dict()
+    stats = Statistics(StatisticsPulls(), StatisticsIssues(), StatisticsWorkflows(), StatisticsRepositories())
 
     # Iterate over each repository
     for repo in repos:
         # Get statistics for the current repository
-        owner, r_name = repo['full_name'].split('/')
-        stats_issues, stats_pulls, stats_workflows, stats_repositories = (
-            __get_stats(owner, r_name, date_range))
+        #owner, r_name = repo['full_name'].split('/')
+        stats_issues, stats_pulls, stats_workflows, stats_repositories = __get_stats(repo['full_name'], date_range)
 
         # Accumulate statistics into the main stats object using the standalone function
         accumulate_stats(stats, stats_issues, stats_pulls, stats_workflows, stats_repositories)
 
-    return stats
+    return stats.to_dict()
 
 
-def __get_stats(owner, name, date_range):
-    # Get issues and pulls data
+def __get_stats(full_name, date_range):
+    """
+    Retrieves and computes statistics related to issues, pull requests, workflows, and repositories
+    for a given repository.
+
+    :param full_name: The owner and name of the repository.
+    :type full_name: str
+    :param date_range: Date range filter for issues and pull requests (e.g., "2023-01-01,2023-12-31").
+    :type date_range: str
+    :return: Tuple containing statistics for issues, pull requests, workflows, and repositories.
+    :rtype: Tuple[StatisticsIssues, StatisticsPulls, StatisticsWorkflows, StatisticsRepositories]
+    """
     issues_data = {
-        "OPEN": get_issues_of_repo(owner, name, "issues", "OPEN", date_range, -1)[0],
-        "CLOSED": get_issues_of_repo(owner, name, "issues", "CLOSED", date_range, -1)[0]
+        "OPEN": business.elaborate_issues(full_name, "issues", "OPEN", date_range, -1).items,
+        "CLOSED": business.elaborate_issues(full_name, "issues", "CLOSED", date_range, -1).items,
     }
 
     pulls_data = {
-        "OPEN": get_issues_of_repo(owner, name, "pulls", "OPEN", date_range, -1)[0],
-        "CLOSED": get_issues_of_repo(owner, name, "pulls", "CLOSED", date_range, -1)[0],
-        "MERGED": get_issues_of_repo(owner, name, "pulls", "MERGED", date_range, -1)[0]
+        "OPEN": business.elaborate_issues(full_name, "pulls", "OPEN", date_range, -1).items,
+        "CLOSED": business.elaborate_issues(full_name, "pulls", "CLOSED", date_range, -1).items,
+        "MERGED": business.elaborate_issues(full_name, "pulls", "MERGED", date_range, -1).items
     }
 
     # Compute statistics for issues
@@ -293,8 +296,7 @@ def __get_stats(owner, name, date_range):
     )
 
     # Combine issues and pulls data for repository statistics
-    combined_issues = issues_data["OPEN"] + issues_data["CLOSED"] + \
-                      pulls_data["OPEN"] + pulls_data["CLOSED"]
+    combined_issues = issues_data["OPEN"] + issues_data["CLOSED"] + pulls_data["OPEN"] + pulls_data["CLOSED"]
 
     # Compute statistics for repositories
     stats_repositories = StatisticsRepositories(
@@ -302,6 +304,7 @@ def __get_stats(owner, name, date_range):
     )
 
     # Compute statistics for workflows
+    owner, name = full_name.split("/")
     workflows_data = get_workflows_of_repo(owner, name)[0]
     stats_workflows = StatisticsWorkflows(
         metrics=generate_metrics_workflow_map(workflows_data)

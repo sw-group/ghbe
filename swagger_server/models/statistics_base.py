@@ -6,7 +6,6 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.map_string_number import MapStringNumber  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,17 +14,17 @@ class StatisticsBase(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, daily_closed_progress: MapStringNumber=None, daily_opened_progress: MapStringNumber=None):  # noqa: E501
+    def __init__(self, daily_closed_progress: Dict[str, int]=None, daily_opened_progress: Dict[str, int]=None):  # noqa: E501
         """StatisticsBase - a model defined in Swagger
 
         :param daily_closed_progress: The daily_closed_progress of this StatisticsBase.  # noqa: E501
-        :type daily_closed_progress: MapStringNumber
+        :type daily_closed_progress: Dict[str, int]
         :param daily_opened_progress: The daily_opened_progress of this StatisticsBase.  # noqa: E501
-        :type daily_opened_progress: MapStringNumber
+        :type daily_opened_progress: Dict[str, int]
         """
         self.swagger_types = {
-            'daily_closed_progress': MapStringNumber,
-            'daily_opened_progress': MapStringNumber
+            'daily_closed_progress': Dict[str, int],
+            'daily_opened_progress': Dict[str, int]
         }
 
         self.attribute_map = {
@@ -47,43 +46,43 @@ class StatisticsBase(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def daily_closed_progress(self) -> MapStringNumber:
+    def daily_closed_progress(self) -> Dict[str, int]:
         """Gets the daily_closed_progress of this StatisticsBase.
 
 
         :return: The daily_closed_progress of this StatisticsBase.
-        :rtype: MapStringNumber
+        :rtype: Dict[str, int]
         """
         return self._daily_closed_progress
 
     @daily_closed_progress.setter
-    def daily_closed_progress(self, daily_closed_progress: MapStringNumber):
+    def daily_closed_progress(self, daily_closed_progress: Dict[str, int]):
         """Sets the daily_closed_progress of this StatisticsBase.
 
 
         :param daily_closed_progress: The daily_closed_progress of this StatisticsBase.
-        :type daily_closed_progress: MapStringNumber
+        :type daily_closed_progress: Dict[str, int]
         """
 
         self._daily_closed_progress = daily_closed_progress
 
     @property
-    def daily_opened_progress(self) -> MapStringNumber:
+    def daily_opened_progress(self) -> Dict[str, int]:
         """Gets the daily_opened_progress of this StatisticsBase.
 
 
         :return: The daily_opened_progress of this StatisticsBase.
-        :rtype: MapStringNumber
+        :rtype: Dict[str, int]
         """
         return self._daily_opened_progress
 
     @daily_opened_progress.setter
-    def daily_opened_progress(self, daily_opened_progress: MapStringNumber):
+    def daily_opened_progress(self, daily_opened_progress: Dict[str, int]):
         """Sets the daily_opened_progress of this StatisticsBase.
 
 
         :param daily_opened_progress: The daily_opened_progress of this StatisticsBase.
-        :type daily_opened_progress: MapStringNumber
+        :type daily_opened_progress: Dict[str, int]
         """
 
         self._daily_opened_progress = daily_opened_progress

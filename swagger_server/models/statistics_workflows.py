@@ -6,7 +6,6 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.map_string_number import MapStringNumber  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,14 +14,14 @@ class StatisticsWorkflows(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, metrics: MapStringNumber=None):  # noqa: E501
+    def __init__(self, metrics: Dict[str, int]=None):  # noqa: E501
         """StatisticsWorkflows - a model defined in Swagger
 
         :param metrics: The metrics of this StatisticsWorkflows.  # noqa: E501
-        :type metrics: MapStringNumber
+        :type metrics: Dict[str, int]
         """
         self.swagger_types = {
-            'metrics': MapStringNumber
+            'metrics': Dict[str, int]
         }
 
         self.attribute_map = {
@@ -42,22 +41,22 @@ class StatisticsWorkflows(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def metrics(self) -> MapStringNumber:
+    def metrics(self) -> Dict[str, int]:
         """Gets the metrics of this StatisticsWorkflows.
 
 
         :return: The metrics of this StatisticsWorkflows.
-        :rtype: MapStringNumber
+        :rtype: Dict[str, int]
         """
         return self._metrics
 
     @metrics.setter
-    def metrics(self, metrics: MapStringNumber):
+    def metrics(self, metrics: Dict[str, int]):
         """Sets the metrics of this StatisticsWorkflows.
 
 
         :param metrics: The metrics of this StatisticsWorkflows.
-        :type metrics: MapStringNumber
+        :type metrics: Dict[str, int]
         """
 
         self._metrics = metrics

@@ -5,8 +5,9 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
-from swagger_server.models.comment import Comment  # noqa: E501
-from swagger_server.models.issue import Issue  # noqa: E501
+from swagger_server.models.comments_list import CommentsList  # noqa: E501
+from swagger_server.models.issues_list import IssuesList  # noqa: E501
+from swagger_server.models.repositories_list import RepositoriesList  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
 from swagger_server.models.workflow import Workflow  # noqa: E501

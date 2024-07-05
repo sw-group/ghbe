@@ -6,7 +6,6 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.map_string_number import MapStringNumber  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,17 +14,17 @@ class Metrics(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, languages: List[str]=None, maxes: MapStringNumber=None):  # noqa: E501
+    def __init__(self, languages: List[str]=None, maxes: Dict[str, int]=None):  # noqa: E501
         """Metrics - a model defined in Swagger
 
         :param languages: The languages of this Metrics.  # noqa: E501
         :type languages: List[str]
         :param maxes: The maxes of this Metrics.  # noqa: E501
-        :type maxes: MapStringNumber
+        :type maxes: Dict[str, int]
         """
         self.swagger_types = {
             'languages': List[str],
-            'maxes': MapStringNumber
+            'maxes': Dict[str, int]
         }
 
         self.attribute_map = {
@@ -68,22 +67,22 @@ class Metrics(Model):
         self._languages = languages
 
     @property
-    def maxes(self) -> MapStringNumber:
+    def maxes(self) -> Dict[str, int]:
         """Gets the maxes of this Metrics.
 
 
         :return: The maxes of this Metrics.
-        :rtype: MapStringNumber
+        :rtype: Dict[str, int]
         """
         return self._maxes
 
     @maxes.setter
-    def maxes(self, maxes: MapStringNumber):
+    def maxes(self, maxes: Dict[str, int]):
         """Sets the maxes of this Metrics.
 
 
         :param maxes: The maxes of this Metrics.
-        :type maxes: MapStringNumber
+        :type maxes: Dict[str, int]
         """
 
         self._maxes = maxes

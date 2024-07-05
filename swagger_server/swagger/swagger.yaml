@@ -147,11 +147,7 @@ paths:
           content:
             application/json:
               schema:
-                title: RepositoryList
-                type: array
-                items:
-                  $ref: '#/components/schemas/Repository'
-                x-content-type: application/json
+                $ref: '#/components/schemas/RepositoriesList'
         "400":
           description: Bad Request
         "422":
@@ -329,11 +325,8 @@ paths:
           content:
             application/json:
               schema:
-                title: IssuesList
-                type: array
-                items:
-                  $ref: '#/components/schemas/Issue'
-                x-content-type: application/json
+                $ref: '#/components/schemas/IssuesList'
+              x-content-type: application/json
         "400":
           description: Bad Request
         "422":
@@ -392,11 +385,8 @@ paths:
           content:
             application/json:
               schema:
-                title: CommentsList
-                type: array
-                items:
-                  $ref: '#/components/schemas/Comment'
-                x-content-type: application/json
+                $ref: '#/components/schemas/CommentsList'
+              x-content-type: application/json
         "400":
           description: Bad Request
         "422":
@@ -808,20 +798,23 @@ components:
           dailyClosedProgress:
             stats:
               key: 0
-    MapStringNumber:
-      type: object
-      additionalProperties:
-        type: integer
-        format: int32
-      example:
-        key: 0
     Statistics_base:
       type: object
       properties:
         dailyClosedProgress:
-          $ref: '#/components/schemas/MapStringNumber'
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+          example:
+            key: 0
         dailyOpenedProgress:
-          $ref: '#/components/schemas/MapStringNumber'
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+          example:
+            key: 0
       example:
         dailyClosedProgress:
           key: 0
@@ -854,7 +847,12 @@ components:
       type: object
       properties:
         metrics:
-          $ref: '#/components/schemas/MapStringNumber'
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+          example:
+            key: 0
       example:
         metrics:
           key: 0
@@ -862,7 +860,12 @@ components:
       type: object
       properties:
         stats:
-          $ref: '#/components/schemas/MapStringNumber'
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+          example:
+            key: 0
       example:
         stats:
           key: 0
@@ -874,11 +877,56 @@ components:
           items:
             type: string
         maxes:
-          $ref: '#/components/schemas/MapStringNumber'
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+          example:
+            key: 0
       example:
         languages:
         - languages
         - languages
         maxs:
           key: 0
+    Result:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int32
+    RepositoriesList:
+      title: RepositoriesList
+      allOf:
+      - $ref: '#/components/schemas/Result'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Repository'
+      x-content-type: application/json
+    IssuesList:
+      title: IssuesList
+      allOf:
+      - $ref: '#/components/schemas/Result'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Issue'
+    CommentsList:
+      title: CommentsList
+      allOf:
+      - $ref: '#/components/schemas/Result'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Comment'
 
