@@ -13,4 +13,3 @@ def get_metrics():  # noqa: E501
     :rtype: Metrics
     """
     return business.elaborate_metrics_repositories().to_dict()
-

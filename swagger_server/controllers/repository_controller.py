@@ -29,7 +29,8 @@ def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
 
 
 def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, page=None, sort=None):  # noqa: E501
-    """Search issues of the repo by fullname
+    """
+    Search issues of the repo by fullname
 
     Search issues of the repo by fullname # noqa: E501
 
@@ -45,12 +46,11 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
     :type date_range: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
-    :param sort: Sort repositories by field in ascending or descending order  (e.g., field-asc or field-desc). If order is not specified, default to ascending. 
+    :param sort: Sort repositories by field in ascending or descending order  (e.g., field-asc or field-desc). If order is not specified, default to ascending.
     :type sort: str
 
     :rtype: IssuesList
     """
-
     repo_full_name = f'{owner}/{name}'
     return business.elaborate_issues(repo_full_name, issue_type, state, date_range, page, sort).to_dict()
 
@@ -83,13 +83,13 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
     :type watchers: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
-    :param sort: Sort repositories by field in ascending or descending order  (e.g., field-asc or field-desc). If order is not specified, default to ascending. 
+    :param sort: Sort repositories by field in ascending or descending order  (e.g., field-asc or field-desc). If order is not specified, default to ascending.
     :type sort: str
 
     :rtype: RepositoriesList
     """
-    return business.elaborate_repositories(name, language, is_private, date_range, stars, forks,
-                                           issues, pulls, workflows, watchers, page, sort).to_dict()
+    return business.elaborate_repositories(name, language, is_private, date_range, stars, forks, issues, pulls,
+                                           workflows, watchers, page, sort).to_dict()
 
 
 def get_repository_by_full_name(owner, name):  # noqa: E501
