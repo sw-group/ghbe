@@ -7,7 +7,7 @@ if sys.version_info < (3, 7):
 
     def is_generic(klass):
         """ Determine whether klass is a generic class """
-        return type(klass) == typing.GenericMeta
+        return type(klass) == typing.Generic
 
     def is_dict(klass):
         """ Determine whether klass is a Dict """

@@ -1,12 +1,11 @@
 from collections import defaultdict
 
-from swagger_server.models import IssueLabels, Issue, Statistics
+from swagger_server.models import IssueLabels, Issue, Statistics, Workflow
 from swagger_server.models import StatisticsIssues, StatisticsPulls, StatisticsRepositories, StatisticsWorkflows
-from swagger_server.models.metrics import Metrics
 from typing import List, Dict
 
 
-def generate_date_count_map(issue_list: List[Issue]) -> Dict[str,int]:
+def generate_date_count_map(issue_list: List[Issue]) -> Dict[str, int]:
     """
     Generates a map with dates as keys and counts of issues as values.
 
@@ -28,45 +27,6 @@ def generate_date_count_map(issue_list: List[Issue]) -> Dict[str,int]:
     return dict(date_count_map)
 
 
-def __check_labels(issue_labels: List[IssueLabels], labels: List[str], label_count_map: Dict[str, int]) -> bool:
-    """
-    Check if any of the issue labels match the provided labels and update the label count map.
-
-    :param issue_labels: The labels of the issue
-    :type issue_labels: List[IssueLabels]
-    :param labels: The labels to check against
-    :type labels: List[str]
-    :param label_count_map: A dictionary to keep count of label occurrences
-    :type label_count_map: Dict[str, int]
-    :return: True if any of the labels match, False otherwise
-    :rtype: bool
-    """
-    for label in labels:
-        for issue_label in issue_labels:
-            if label in issue_label.name:
-                label_count_map[label] += 1
-                return True
-    return False
-
-def __check_body_and_title(issue: Issue, labels: List[str], label_count_map: Dict[str, int]) -> None:
-    """
-    Check if any of the labels are present in the issue's body or title and update the label count map.
-
-    :param issue: The issue object containing body and title
-    :type issue: Issue
-    :param labels: The labels to check against
-    :type labels: List[str]
-    :param label_count_map: A dictionary to keep count of label occurrences
-    :type label_count_map: Dict[str, int]
-    :return: None
-    :rtype: None
-    """
-    for label in labels:
-        if label in issue.body or label in issue.title:
-            label_count_map[label] += 1
-            return
-
-
 def generate_label_count_map(issues: List[Issue]):
     from collections import defaultdict
     labels = ['bug', 'documentation', 'duplicate', 'enhancement', 'good first issue', 'help wanted', 'invalid',
@@ -83,17 +43,17 @@ def generate_label_count_map(issues: List[Issue]):
     return label_count_map
 
 
-def generate_metrics_workflow_map(workflows):
+def generate_metrics_workflow_map(workflows: List[Workflow]):
     from collections import defaultdict
     label_count_map = defaultdict(float)
     # Filter workflows where "lines" is not None
-    valid_workflows = [w for w in workflows if w["lines"] is not None]
+    valid_workflows = [w for w in workflows if w.lines is not None]
 
     # Calculate the sum of lines and count of valid workflows
-    total_lines = sum(w["lines"] for w in valid_workflows)
+    total_lines = sum(w.lines for w in valid_workflows)
 
     # Calculate the sum of sizes in bytes and count of valid workflows
-    total_size_bytes = sum(convert_size_to_bytes(w["size"]) for w in valid_workflows)
+    total_size_bytes = sum(convert_size_to_bytes(w.size) for w in valid_workflows)
 
     count_valid_workflows = len(valid_workflows)
 
@@ -140,8 +100,6 @@ def accumulate_stats(stats, stats_issues, stats_pulls, stats_workflows, stats_re
     stats.workflows.metrics = stats.workflows.metrics or {}
     stats.repositories.stats = stats.repositories.stats or {}
 
-    print(stats.issues.daily_closed_progress)
-    print(stats_issues.daily_closed_progress)
     # Accumulate issues
     __accumulate_dict_values(stats.issues.daily_closed_progress, stats_issues.daily_closed_progress)
     __accumulate_dict_values(stats.issues.daily_opened_progress, stats_issues.daily_opened_progress)
@@ -157,6 +115,45 @@ def accumulate_stats(stats, stats_issues, stats_pulls, stats_workflows, stats_re
     # Accumulate repositories stats
     __accumulate_dict_values(stats.repositories.stats, stats_repositories.stats)
 
+
+def __check_labels(issue_labels: List[IssueLabels], labels: List[str], label_count_map: Dict[str, int]) -> bool:
+    """
+    Check if any of the issue labels match the provided labels and update the label count map.
+
+    :param issue_labels: The labels of the issue
+    :type issue_labels: List[IssueLabels]
+    :param labels: The labels to check against
+    :type labels: List[str]
+    :param label_count_map: A dictionary to keep count of label occurrences
+    :type label_count_map: Dict[str, int]
+    :return: True if any of the labels match, False otherwise
+    :rtype: bool
+    """
+    for label in labels:
+        for issue_label in issue_labels:
+            if label in issue_label.name:
+                label_count_map[label] += 1
+                return True
+    return False
+
+def __check_body_and_title(issue: Issue, labels: List[str], label_count_map: Dict[str, int]):
+    """
+    Check if any of the labels are present in the issue's body or title and update the label count map.
+
+    :param issue: The issue object containing body and title
+    :type issue: Issue
+    :param labels: The labels to check against
+    :type labels: List[str]
+    :param label_count_map: A dictionary to keep count of label occurrences
+    :type label_count_map: Dict[str, int]
+    :return: void
+    """
+    for label in labels:
+        if label in issue.body or label in issue.title:
+            label_count_map[label] += 1
+            return
+
+
 def __accumulate_dict_values(target: Dict[str, int], source: Dict[str, int]):
     """
     Accumulate values from the source dictionary into the target MapStringNumber instance.
@@ -169,17 +166,4 @@ def __accumulate_dict_values(target: Dict[str, int], source: Dict[str, int]):
     for key, value in source.items():
         target.setdefault(key, 0)
         target[key] += value
-
-
-def validate_date_range(date_range):
-    from datetime import datetime
-    try:
-        start_date_str, end_date_str = date_range.split(',')
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-        end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-        if (end_date - start_date).days > 31:
-            return "dateRange cannot exceed 30 days"
-        return None
-    except ValueError:
-        return "Invalid dateRange format"
 

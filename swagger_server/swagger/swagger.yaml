@@ -367,8 +367,9 @@ paths:
         style: simple
         explode: false
         schema:
-          type: string
-          default: "1"
+          type: integer
+          format: int32
+          default: 1
       - name: page
         in: query
         description: Specify the page number for paginated results (default is 1)

@@ -74,8 +74,67 @@ class MongoOperations:
         repositories = list(cursor)
         return repositories
 
+    def get_repository(self, full_name):
+        return self.collection.find_one({"_id": full_name})
+
+    def get_issues(self, repo, state=None, date_range=None, page=1, sort=None):
+        query = {'repo': repo}
+
+        if state:
+            query['state'] = state.upper()
+        if date_range:
+            start_date, end_date = date_range.split(',')
+            s_date = datetime.strptime(start_date, '%Y-%m-%d')
+            e_date = datetime.combine(datetime.strptime(end_date, '%Y-%m-%d').date(), datetime.max.time())
+            query['updatedAt'] = {
+                '$gte': s_date.isoformat(),  # Start of the filter_date
+                '$lt': e_date.isoformat()  # End of the filter_date
+            }
+
+        # Sorting (1 = asc; -1 = desc)
+        sort_order = -1
+        if sort:
+            field, order = sort.split('-')
+            sort_order = 1 if order == 'asc' else -1
+        else:
+            field = 'updatedAt'
+
+        # Pagination
+        per_page = 20  # Define your pagination size
+        skip = (page - 1) * per_page
+
+        if page == -1:
+            cursor = self.collection.find(query).sort(field, sort_order)
+        else:
+            cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+
+        issues = list(cursor)
+        return issues
+
+    def get_comments(self, repo, number, page=1):
+        query = {'repo': repo, 'issue_number': int(number)}
+
+        # Sorting (1 = asc; -1 = desc)
+        sort_order = -1
+        field = 'createdAt'
+
+        # Pagination
+        per_page = 20  # Define your pagination size
+        skip = (page - 1) * per_page
+
+        cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+
+        comments = list(cursor)
+        return comments
+
+    def get_workflows(self, full_name):
+        return self.collection.find_one({"_id": full_name})
+
+    def close(self):
+        self.client.close()
+
     def count_repositories(self, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
-                         issues=None, pulls=None, workflows=None, watchers=None):
+                           issues=None, pulls=None, workflows=None, watchers=None):
         query = {}
 
         if name:
@@ -123,40 +182,6 @@ class MongoOperations:
         total = self.collection.count_documents(query)
         return total
 
-    def get_issues(self, repo, state=None, date_range=None, page=1, sort=None):
-        query = {'repo': repo}
-
-        if state:
-            query['state'] = state.upper()
-        if date_range:
-            start_date, end_date = date_range.split(',')
-            s_date = datetime.strptime(start_date, '%Y-%m-%d')
-            e_date = datetime.combine(datetime.strptime(end_date, '%Y-%m-%d').date(), datetime.max.time())
-            query['updatedAt'] = {
-                '$gte': s_date.isoformat(),  # Start of the filter_date
-                '$lt': e_date.isoformat()  # End of the filter_date
-            }
-
-        # Sorting (1 = asc; -1 = desc)
-        sort_order = -1
-        if sort:
-            field, order = sort.split('-')
-            sort_order = 1 if order == 'asc' else -1
-        else:
-            field = 'updatedAt'
-
-        # Pagination
-        per_page = 20  # Define your pagination size
-        skip = (page - 1) * per_page
-
-        if page == -1:
-            cursor = self.collection.find(query).sort(field, sort_order)
-        else:
-            cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
-
-        issues = list(cursor)
-        return issues
-
     def count_issues(self, repo, state=None, date_range=None):
         query = {'repo': repo}
 
@@ -175,21 +200,9 @@ class MongoOperations:
 
         return total
 
-    def get_comments(self, repo, number, page=1):
+    def count_issue_comments(self, repo, number=None):
         query = {'repo': repo, 'issue_number': int(number)}
 
-        # Sorting (1 = asc; -1 = desc)
-        sort_order = -1
-        field = 'createdAt'
+        total = self.collection.count_documents(query)
 
-        # Pagination
-        per_page = 20  # Define your pagination size
-        skip = (page - 1) * per_page
-
-        cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
-
-        comments = list(cursor)
-        return comments
-
-    def close(self):
-        self.client.close()
+        return total
