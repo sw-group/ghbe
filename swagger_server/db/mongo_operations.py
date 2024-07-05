@@ -67,9 +67,9 @@ class MongoOperations:
         skip = (page - 1) * per_page
 
         if page == -1:
-            cursor = self.collection.find(query).sort(field, sort_order)
+            cursor = self.collection.find(query).sort('data.' + field, sort_order)
         else:
-            cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+            cursor = self.collection.find(query).sort('data.' + field, sort_order).skip(skip).limit(per_page)
 
         repositories = list(cursor)
         return repositories
