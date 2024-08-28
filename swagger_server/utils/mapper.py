@@ -40,6 +40,7 @@ def map_response_to_workflow(response):
 def map_response_to_issue(issue):
     """Maps a dictionary from MongoDB to an Issue instance."""
     return Issue(
+        repo=issue.get('repo'),
         number=issue.get('number'),
         title=issue.get('title'),
         url=issue.get('url'),
