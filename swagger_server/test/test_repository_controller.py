@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 from flask import json
 from six import BytesIO
+from swagger_server.test import BaseTestCase
 
 from swagger_server.models.comments_list import CommentsList  # noqa: E501
 from swagger_server.models.issues_list import IssuesList  # noqa: E501
@@ -11,7 +12,6 @@ from swagger_server.models.repositories_list import RepositoriesList  # noqa: E5
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
 from swagger_server.models.workflow import Workflow  # noqa: E501
-from swagger_server.test import BaseTestCase
 
 
 class TestRepositoryController(BaseTestCase):
@@ -22,12 +22,9 @@ class TestRepositoryController(BaseTestCase):
 
         Search issues of the repo by fullname
         """
-        owner = 'owner_example'
-        name = 'name_example'
-        number = 1
         query_string = [('page', 1)]
         response = self.client.open(
-            f'/ghbe/api/v1/repositories/{owner}/{name}/issues/{number}/comments',
+            '/ghbe/api/v1/repositories/{owner}/{name}/issues/{number}/comments'.format(owner='owner_example', name='name_example', number=56),
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -43,10 +40,8 @@ class TestRepositoryController(BaseTestCase):
                         ('date_range', 'date_range_example'),
                         ('page', 1),
                         ('sort', 'sort_example')]
-        owner = 'owner_example'
-        name = 'name_example'
         response = self.client.open(
-            f'/ghbe/api/v1/repositories/{owner}/{name}/issues',
+            '/ghbe/api/v1/repositories/{owner}/{name}/issues'.format(owner='owner_example', name='name_example'),
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -81,10 +76,8 @@ class TestRepositoryController(BaseTestCase):
 
         Search repositories by filter
         """
-        owner = 'owner_example'
-        name = 'name_example'
         response = self.client.open(
-            f'/ghbe/api/v1/repositories/{owner}/{name}',
+            '/ghbe/api/v1/repositories/{owner}/{name}'.format(owner='owner_example', name='name_example'),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -117,10 +110,8 @@ class TestRepositoryController(BaseTestCase):
         Compute the statistics of a repository
         """
         query_string = [('date_range', 'date_range_example')]
-        owner = 'owner_example'
-        name = 'name_example'
         response = self.client.open(
-            f'/ghbe/api/v1/repositories/{owner}/{name}/statistics',
+            '/ghbe/api/v1/repositories/{owner}/{name}/statistics'.format(owner='owner_example', name='name_example'),
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -131,10 +122,8 @@ class TestRepositoryController(BaseTestCase):
 
         Search workflows of the repo by fullname
         """
-        owner = 'owner_example'
-        name = 'name_example'
         response = self.client.open(
-            f'/ghbe/api/v1/repositories/{owner}/{name}/workflows',
+            '/ghbe/api/v1/repositories/{owner}/{name}/workflows'.format(owner='owner_example', name='name_example'),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
