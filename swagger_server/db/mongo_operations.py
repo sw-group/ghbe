@@ -32,7 +32,7 @@ class MongoOperations:
 
         if stars:
             min_stars, max_stars = stars.split(',')
-            query['data.starts_count'] = {'$gte': int(min_stars), '$lte': int(max_stars)}
+            query['data.stars_count'] = {'$gte': int(min_stars), '$lte': int(max_stars)}
 
         if pulls:
             min_pull, max_pull = pulls.split(',')
@@ -157,7 +157,7 @@ class MongoOperations:
 
         if stars:
             min_stars, max_stars = stars.split(',')
-            query['data.starts_count'] = {'$gte': int(min_stars), '$lte': int(max_stars)}
+            query['data.stars_count'] = {'$gte': int(min_stars), '$lte': int(max_stars)}
 
         if pulls:
             min_pull, max_pull = pulls.split(',')
