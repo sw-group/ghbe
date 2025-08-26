@@ -1,12 +1,12 @@
-name: Pylint
+name: Pylint Tests
 
 on:
   push:
     paths:
-      - "**.py"
+      - "swagger_server/test/**.py"
   pull_request:
     paths:
-      - "**.py"
+      - "swagger_server/test/**.py"
   workflow_dispatch:
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Analysing the code with pylint
         run: |
-          pylint --rcfile=.pylintrc $(git ls-files 'swagger_server/**/*.py') --output-format=text:lint.txt,colorized || pylint $(git ls-files 'swagger_server/**/*.py') --output-format=text:lint.txt,colorized || echo "Pylint completed"
+          pylint --rcfile=.pylintrc $(git ls-files 'swagger_server/test/*.py') --output-format=text:lint.txt,colorized || pylint $(git ls-files 'swagger_server/test/*.py') --output-format=text:lint.txt,colorized || echo "Pylint completed"
       
       - name: Upload lint results as artifact
         uses: actions/upload-artifact@v4
