@@ -1,7 +1,10 @@
 import connexion
+from flask import jsonify
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
-from swagger_server.controllers.gui_controller import register_routes
+from swagger_server.controllers.gui_controller import register_gui_routes
+from swagger_server.controllers.repository_controller import register_repository_routes
 from swagger_server.encoder import JSONEncoder
 
 def create_app():
@@ -19,7 +22,20 @@ def create_app():
         pythonic_params=True
     )
 
+    # Global error handler for JSON responses
+    @connex_app.app.errorhandler(HTTPException)
+    def handle_http_exception(e):
+        response = e.get_response()
+        response.data = jsonify({
+            "code": e.code,
+            "name": e.name,
+            "description": e.description
+        }).data
+        response.content_type = "application/json"
+        return response
+
     # Register the extra Flask route
-    register_routes(connex_app.app)
+    register_gui_routes(connex_app.app)
+    register_repository_routes(connex_app.app)
 
     return connex_app  # return the Flask app, not the Connexion wrapper

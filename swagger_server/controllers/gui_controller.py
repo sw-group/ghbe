@@ -17,7 +17,7 @@ def get_metrics():  # noqa: E501
 
 
 # Register also as a Flask route
-def register_routes(app):
+def register_gui_routes(app):
     @app.route("/metrics", methods=["GET"])
     def metrics_route():
         # Reuse the same logic

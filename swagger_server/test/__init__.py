@@ -8,6 +8,7 @@ class BaseTestCase(TestCase):
         """Required by Flask-Testing: return a Flask app instance"""
         app = create_app().app
         app.config['TESTING'] = True
+        app.config['PROPAGATE_EXCEPTIONS'] = True
         return app
 
     def assertJsonResponse(self, response, expected_status_code=200):

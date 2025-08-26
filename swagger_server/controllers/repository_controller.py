@@ -4,8 +4,7 @@ from swagger_server.models.issues_list import IssuesList  # noqa: E501
 from swagger_server.models.repositories_list import RepositoriesList  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
-from swagger_server.models.workflow import Workflow  # noqa: E501
-from swagger_server import util
+from flask import jsonify, request
 
 
 def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
@@ -176,3 +175,82 @@ def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
     """
     repo_full_name = f"{owner}/{name}"
     return business.elaborate_statistic(repo_full_name, date_range).to_dict()
+
+
+def register_repository_routes(app):
+    # /repositories
+    @app.route("/repositories", methods=["GET"])
+    def repositories_route():
+        return jsonify(get_repositories(
+            name=request.args.get("name"),
+            language=request.args.get("language"),
+            is_private=request.args.get("isPrivate") == "true",
+            date_range=request.args.get("dateRange"),
+            stars=request.args.get("stars"),
+            forks=request.args.get("forks"),
+            issues=request.args.get("issues"),
+            pulls=request.args.get("pulls"),
+            workflows=request.args.get("workflows"),
+            watchers=request.args.get("watchers"),
+            page=int(request.args.get("page", 1)) if request.args.get("page") else 1,
+            sort=request.args.get("sort")
+        ))
+
+    # /repositories/statistics
+    @app.route("/repositories/statistics", methods=["GET"])
+    def repositories_statistics_route():
+        return jsonify(get_statistics(
+            date_range=request.args.get("dateRange"),
+            name=request.args.get("name"),
+            language=request.args.get("language"),
+            is_private=request.args.get("isPrivate") == "true",
+            stars=request.args.get("stars"),
+            forks=request.args.get("forks"),
+            issues=request.args.get("issues"),
+            pulls=request.args.get("pulls"),
+            workflows=request.args.get("workflows"),
+            watchers=request.args.get("watchers")
+        ))
+
+    # /repositories/{owner}/{name}
+    @app.route("/repositories/<owner>/<name>", methods=["GET"])
+    def repository_by_full_name_route(owner, name):
+        return jsonify(get_repository_by_full_name(owner, name))
+
+    # /repositories/{owner}/{name}/workflows
+    @app.route("/repositories/<owner>/<name>/workflows", methods=["GET"])
+    def workflows_of_repo_route(owner, name):
+        return jsonify(get_workflows_of_repo(owner, name))
+
+    # /repositories/{owner}/{name}/issues
+    @app.route("/repositories/<owner>/<name>/issues", methods=["GET"])
+    def issues_of_repo_route(owner, name):
+        return jsonify(get_issues_of_repo(
+            owner,
+            name,
+            issue_type=request.args.get("issue_type"),
+            state=request.args.get("state"),
+            date_range=request.args.get("dateRange"),
+            page=int(request.args.get("page", 1)) if request.args.get("page") else 1,
+            sort=request.args.get("sort")
+        ))
+
+    # /repositories/{owner}/{name}/issues/{number}/comments
+    @app.route("/repositories/<owner>/<name>/issues/<int:number>/comments", methods=["GET"])
+    def comments_of_issue_route(owner, name, number):
+        return jsonify(get_comments_of_issue(
+            owner,
+            name,
+            number,
+            page=int(request.args.get("page", 1)) if request.args.get("page") else 1,
+        ))
+
+    # /repositories/{owner}/{name}/statistics
+    @app.route("/repositories/<owner>/<name>/statistics", methods=["GET"])
+    def statistics_of_repository_route(owner, name):
+        return jsonify(get_statistics_of_repository(
+            owner,
+            name,
+            date_range=request.args.get("dateRange")
+        ))
+
