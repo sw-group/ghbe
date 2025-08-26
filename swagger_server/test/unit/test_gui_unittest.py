@@ -1,11 +1,13 @@
 import unittest
 from unittest.mock import patch
-
 from swagger_server.controllers.gui_controller import get_metrics
 
 
-class TestGuiControllerUnit(unittest.TestCase):
-    """UNIT TESTS - Test controller logic in isolation with mocks"""
+# -------------------
+# White Box Unit Tests
+# -------------------
+class TestGuiControllerWhiteBox(unittest.TestCase):
+    """UNIT TESTS - White Box: know the internal business layer usage"""
 
     @patch('swagger_server.controllers.gui_controller.business.elaborate_metrics_repositories')
     def test_get_metrics_success(self, mock_elaborate):
@@ -17,7 +19,6 @@ class TestGuiControllerUnit(unittest.TestCase):
                 "stars_count": 3673
             }
         }
-
         mock_elaborate.return_value.to_dict.return_value = expected_response
 
         result = get_metrics()
@@ -53,6 +54,13 @@ class TestGuiControllerUnit(unittest.TestCase):
 
         with self.assertRaises(AttributeError):
             get_metrics()
+
+
+# -------------------
+# Black Box Unit Tests
+# -------------------
+class TestGuiControllerBlackBox(unittest.TestCase):
+    """UNIT TESTS - Black Box: function signature / contract verification"""
 
     def test_get_metrics_function_contract(self):
         """Test function signature and return type contract"""

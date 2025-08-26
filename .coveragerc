@@ -1,0 +1,13 @@
+[run]
+source = swagger_server
+omit =
+    # Ignore specific folders
+    */__init__.py
+    */__main__.py
+    encoder.py
+    type_util.py
+    util.py
+    swagger_server/test/*
+    swagger_server/models/*
+    swagger_server/swagger/*
+
