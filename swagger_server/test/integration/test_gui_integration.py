@@ -19,7 +19,7 @@ class TestGuiControllerIntegration(BaseTestCase):
     def test_get_metrics_languages_array(self):
         """GET /metrics should contain a languages array"""
         response = self.client.get("/metrics")
-        data = self.assertJsonResponse(response, 200)
+        data = self.assert_json_response(response, 200)
 
         self.assertIn("languages", data)
         self.assertIsInstance(data["languages"], list)
@@ -27,7 +27,7 @@ class TestGuiControllerIntegration(BaseTestCase):
     def test_get_metrics_maxes_object(self):
         """GET /metrics should contain a maxes object with expected keys"""
         response = self.client.get("/metrics")
-        data = self.assertJsonResponse(response, 200)
+        data = self.assert_json_response(response, 200)
 
         self.assertIn("maxes", data)
         self.assertIsInstance(data["maxes"], dict)
@@ -45,7 +45,7 @@ class TestGuiControllerIntegration(BaseTestCase):
     def test_get_metrics_values_are_numbers(self):
         """Check that numeric fields in maxes are integers"""
         response = self.client.get("/metrics")
-        data = self.assertJsonResponse(response, 200)
+        data = self.assert_json_response(response, 200)
 
         for key, value in data["maxes"].items():
             self.assertIsInstance(value, int)
