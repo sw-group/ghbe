@@ -166,4 +166,3 @@ def __accumulate_dict_values(target: Dict[str, int], source: Dict[str, int]):
     for key, value in source.items():
         target.setdefault(key, 0)
         target[key] += value
-

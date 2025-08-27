@@ -20,7 +20,7 @@ class TestRepositoryControllerWhiteBox(unittest.TestCase):
         self.assertIsInstance(result[0], dict)
         self.assertEqual(result[0]['name'], 'CI Pipeline')
 
-        # Ensure the mock's to_dict() was called
+        # Ensure the mocks to_dict() was called
         mock_workflow.to_dict.assert_called_once()
 
 
