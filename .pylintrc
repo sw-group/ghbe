@@ -3,7 +3,7 @@
 extension-pkg-whitelist=
 
 # Add files or directories to the blacklist. They should be base names, not paths.
-ignore=swagger_server/models, util.py, type_util.py
+ignore=swagger_server/models/, util.py, type_util.py
 
 # List of plugins (as comma separated values of python module names) to load.
 load-plugins=
