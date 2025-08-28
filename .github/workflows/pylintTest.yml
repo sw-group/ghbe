@@ -35,8 +35,14 @@ jobs:
 
       - name: Analysing the code with pylint
         run: |
-          pylint --rcfile=.pylintrc $(git ls-files 'swagger_server/test/*.py') --output-format=text:lint.txt,colorized || pylint $(git ls-files 'swagger_server/test/*.py') --output-format=text:lint.txt,colorized || echo "Pylint completed"
-      
+          FILES=$(git ls-files 'swagger_server/test/*.py')
+          if [ -f .pylintrc ]; then
+            pylint --rcfile=.pylintrc $FILES --output-format=text:lint.txt,colorized
+          else
+            pylint $FILES --output-format=text:lint.txt,colorized
+          fi
+          echo "Pylint completed"
+          
       - name: Upload lint results as artifact
         uses: actions/upload-artifact@v4
         with:
