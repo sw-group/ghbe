@@ -27,6 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pylint
+          pip install pylint-exit
           pip install -r requirements.txt
           pip install -r test-requirements.txt
 
@@ -37,11 +38,16 @@ jobs:
         run: |
           FILES=$(git ls-files 'swagger_server/test/*.py')
           if [ -f .pylintrc ]; then
-            pylint --rcfile=.pylintrc $FILES --output-format=text:lint.txt,colorized
+            echo "pylint --rcfile=.pylintrc $FILES --output-format=text:lint.txt,colorized"
+            pylint --rcfile=.pylintrc $FILES --output-format=text:lint.txt,colorized || pylint-exit $?
           else
-            pylint $FILES --output-format=text:lint.txt,colorized
+            echo "pylint $FILES --output-format=text:lint.txt,colorized"
+            pylint $FILES --output-format=text:lint.txt,colorized || pylint-exit $?
           fi
-          echo "Pylint completed"
+          if [ $? -ne 0 ]; then
+            echo "An error occurred while running pylint." >&2
+            exit 1
+          fi
           
       - name: Upload lint results as artifact
         uses: actions/upload-artifact@v4
