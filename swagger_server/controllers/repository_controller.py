@@ -124,15 +124,15 @@ def get_workflows_of_repo(owner, name):  # noqa: E501
     return [workflow.to_dict() for workflow in workflows]
 
 
-def get_statistics(date_range, name=None, language=None, is_private=None, stars=None, forks=None, issues=None,
+def get_statistics(date_range_stats, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None, issues=None,
                    pulls=None, workflows=None, watchers=None):  # noqa: E501
     """Compute the statistics of all the filtered repositories
 
     Compute the statistics of all the filtered repositories.
     If you want not insert any filter the statistic will realize on every field.    # noqa: E501
 
-    :param date_range: Filter repositories by date range (e.g., 2023-01-01,2023-12-31)
-    :type date_range: str
+    :param date_range_stats: Filter stats by date range (e.g., 2023-01-01,2023-12-31), relative to updated date of issues/pr
+    :type date_range_stats: str
     :param name: Filter repositories by name.
                  If providing a full name, prefix it with repo: (e.g., repo:owner/name).
     :type name: str
@@ -140,6 +140,8 @@ def get_statistics(date_range, name=None, language=None, is_private=None, stars=
     :type language: str
     :param is_private: Filter private repositories
     :type is_private: bool
+    :param date_range: Filter repositories by date range (e.g., 2023-01-01,2023-12-31)
+    :type date_range: str
     :param stars: Filter repositories by stars range (e.g., 10,100)
     :type stars: str
     :param forks: Filter repositories by forks range (e.g., 5,50)
@@ -152,10 +154,12 @@ def get_statistics(date_range, name=None, language=None, is_private=None, stars=
     :type workflows: str
     :param watchers: Filter repositories by watchers range (e.g., 1,5)
     :type watchers: str
+    :param date_range_stats: Filter stats by date range (e.g., 2023-01-01,2023-12-31), relative to updated date of issues/pr
+    :type date_range_stats: str
 
     :rtype: Statistics
     """
-    return business.elaborate_statistics(date_range, name, language, is_private, stars, forks, issues,
+    return business.elaborate_statistics(date_range_stats, name, language, is_private, date_range, stars, forks, issues,
                                          pulls, workflows, watchers).to_dict()
 
 

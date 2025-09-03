@@ -433,7 +433,7 @@ paths:
       - name: dateRange
         in: query
         description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
-        required: true
+        required: false
         style: form
         explode: true
         schema:
@@ -493,6 +493,15 @@ paths:
         schema:
           pattern: "^\\d+,\\d+$"
           type: string
+      - name: dateRangeStats
+        in: query
+        description: "Filter stats by date range (e.g., 2023-01-01,2023-12-31), relative to updated date of issues/pr"
+        required: true
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+          type: string
       responses:
         "200":
           description: Successful operation
@@ -536,7 +545,7 @@ paths:
           default: name
       - name: dateRange
         in: query
-        description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
+        description: "Filter stats by date range (e.g., 2023-01-01,2023-12-31), relative to updated date of issues/pr"
         required: true
         style: form
         explode: true

@@ -1,10 +1,11 @@
 from typing import List
 
-from flask import jsonify
 from werkzeug.exceptions import NotFound, BadRequest
 
 from swagger_server.db.mongo_operations import MongoOperations
-from swagger_server.models import *
+from swagger_server.models import IssuesList, CommentsList, RepositoriesList, Metrics, Repository, Statistics, \
+    StatisticsPulls, StatisticsIssues, StatisticsWorkflows, StatisticsRepositories
+
 from swagger_server.utils import util, validation, mapper
 
 
@@ -179,19 +180,21 @@ def elaborate_workflows(full_name):
         mongo_ops.close()
 
 
-def elaborate_statistics(date_range, name, language, is_private, stars,
+def elaborate_statistics(date_range_stats, name, language, is_private, date_range, stars,
                          forks, issues, pulls, workflows, watchers):
     """
     Retrieves and computes statistics for repositories based on specified criteria.
 
-    :param date_range: Date range filter for repository creation.
-    :type date_range: str
+    :param date_range_stats: Date range filter for stats creation.
+    :type date_range_stats: str
     :param name: Repository name filter.
     :type name: str
     :param language: Programming language filter.
     :type language: str
     :param is_private: Private repository filter.
     :type is_private: bool
+    :param date_range: Date range filter for repository creation.
+    :type date_range: str
     :param stars: Filter minimum and maximum stars filter.
     :type stars: str
     :param forks: Filter minimum and maximum forks filter.
@@ -207,14 +210,14 @@ def elaborate_statistics(date_range, name, language, is_private, stars,
     :return: Statistics computed for the matching repositories.
     :rtype: Statistics
     """
-    error_message = validation.validate_date_range(date_range)
+    error_message = validation.validate_date_range(date_range_stats)
     if error_message:
         raise BadRequest(error_message)
 
     repositories_response = elaborate_repositories(name, language, is_private, date_range, stars,
                                                    forks, issues, pulls, workflows, watchers, -1)
 
-    return __compute_stats(repositories_response.items, date_range)
+    return __compute_stats(repositories_response.items, date_range_stats)
 
 
 def elaborate_statistic(full_name, date_range):
