@@ -119,7 +119,7 @@ class TestBusinessLayerBlackBox(unittest.TestCase):
     @patch('swagger_server.business.business.validation.validate_date_range', return_value=None)
     def test_elaborate_statistics_success(self, mock_validate, mock_repos):
         mock_repos.return_value.items = []
-        result = elaborate_statistics("2023-01-01,2023-12-31", None, None, None, None, None, None, None, None, None)
+        result = elaborate_statistics("2023-01-01,2023-12-31", None, None, None, None, None, None, None, None, None, None)
         self.assertIsInstance(result, Statistics)
 
     @patch('swagger_server.business.business.elaborate_repositories')
@@ -128,7 +128,7 @@ class TestBusinessLayerBlackBox(unittest.TestCase):
         # Cover line 212
         mock_repos.return_value.items = []
         with self.assertRaises(BadRequest):
-            elaborate_statistics("invalid-date-range", None, None, None, None, None, None, None, None, None)
+            elaborate_statistics("invalid-date-range", None, None, None, None, None, None, None, None, None, None)
         mock_validate.assert_called_once_with("invalid-date-range")
 
     @patch('swagger_server.business.business.elaborate_workflows', return_value=[])

@@ -204,10 +204,11 @@ def register_repository_routes(app):
     @app.route("/repositories/statistics", methods=["GET"])
     def repositories_statistics_route():
         return jsonify(get_statistics(
-            date_range=request.args.get("dateRange"),
+            date_range_stats=request.args.get("dateRangeStats"),
             name=request.args.get("name"),
             language=request.args.get("language"),
             is_private=request.args.get("isPrivate") == "true",
+            date_range=request.args.get("dateRange"),
             stars=request.args.get("stars"),
             forks=request.args.get("forks"),
             issues=request.args.get("issues"),
