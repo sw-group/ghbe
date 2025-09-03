@@ -29,12 +29,16 @@ Your Swagger definition lives here:
 ```
 http://localhost:8080/ghbe/api/v1/swagger.json
 ```
+## Testing
+To run the tests, please execute the following from the root directory:
 
-To launch the integration tests, use tox:
 ```
-sudo pip install tox
-tox
+python -m pytest --cov=swagger_server/business --cov=swagger_server/controllers swagger_server/test/ --cov-report=html
 ```
+
+The test coverage report will be generated in the `htmlcov` directory.
+
+
 
 ## Running with Docker
 
