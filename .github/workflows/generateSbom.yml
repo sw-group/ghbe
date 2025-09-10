@@ -19,14 +19,19 @@ jobs:
         with:
           python-version: "3.9"
 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - name: Install CycloneDX tool
         run: pip install cyclonedx-bom
 
-      # For requirements.txt projects
-      - name: Generate SBOM from requirements.txt
-        run: cyclonedx-py requirements requirements.txt -o sbom.json
+      # Generate SBOM from current Python environment
+      - name: Generate SBOM from Python environment
+        run: python -m cyclonedx_py environment --of json > sbom.json
 
-      #Run license check script
+      # Run license check script
       - name: Check Licenses
         run: python scripts/check_licences.py
 
