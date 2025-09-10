@@ -18,7 +18,7 @@ KNOWN_LICENSE_ALIASES = {
 }
 
 
-with open("..sbom.json", "r") as f:
+with open("sbom.json", "r") as f:
     bom = json.load(f)
 
 components_without_license = []

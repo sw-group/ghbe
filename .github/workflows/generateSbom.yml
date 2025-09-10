@@ -28,7 +28,7 @@ jobs:
 
       #Run license check script
       - name: Check Licenses
-        run: python scripts/check_licenses.py
+        run: python scripts/check_licences.py
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
