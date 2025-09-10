@@ -24,7 +24,7 @@ jobs:
 
       # For requirements.txt projects
       - name: Generate SBOM from requirements.txt
-        run: cyclonedx-py requirements -r requirements.txt -o sbom.json
+        run: python cyclonedx_py requirements -r requirements.txt -o sbom.json
 
       #Run license check script
       - name: Check Licenses
