@@ -1,6 +1,5 @@
 import connexion
 from flask import jsonify
-from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
 from swagger_server.controllers.gui_controller import register_gui_routes
@@ -11,9 +10,6 @@ def create_app():
     # Create the connexion app
     connex_app = connexion.App(__name__, specification_dir='./swagger')
     connex_app.app.json_encoder = JSONEncoder
-
-    # Enable CORS on the underlying Flask app
-    CORS(connex_app.app, resources={r"*": {"origins": "*"}})
 
     # Load API from swagger.yaml
     connex_app.add_api(
