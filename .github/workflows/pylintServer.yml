@@ -31,7 +31,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run insert_pylint_directives.py script
-        run: python insert_pylint_directives.py
+        run: python scripts/insert_pylint_directives.py
 
       - name: Analysing the code with pylint
         run: |
