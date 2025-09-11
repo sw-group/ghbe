@@ -51,7 +51,9 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
     :rtype: IssuesList
     """
     repo_full_name = f'{owner}/{name}'
-    return business.elaborate_issues(repo_full_name, issue_type, state, date_range, page, sort).to_dict()
+    values: IssuesList = business.elaborate_issues(repo_full_name, state, date_range, page, sort) if issue_type == "issues" \
+        else business.elaborate_prs(repo_full_name, state, date_range, page, sort)
+    return values.to_dict()
 
 
 def get_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None, issues=None,

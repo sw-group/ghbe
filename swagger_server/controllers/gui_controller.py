@@ -1,5 +1,3 @@
-import connexion
-import six
 from flask import jsonify
 
 from swagger_server.business import business

@@ -4,12 +4,16 @@ from werkzeug.exceptions import HTTPException
 
 from swagger_server.controllers.gui_controller import register_gui_routes
 from swagger_server.controllers.repository_controller import register_repository_routes
+from swagger_server.db.mongo_operations import mongo
 from swagger_server.encoder import JSONEncoder
 
 def create_app():
     # Create the connexion app
     connex_app = connexion.App(__name__, specification_dir='./swagger')
     connex_app.app.json_encoder = JSONEncoder
+
+    connex_app.app.config['MONGO_URI'] = "mongodb://localhost:27017/mining"
+    mongo.init_app(connex_app.app)
 
     # Load API from swagger.yaml
     connex_app.add_api(

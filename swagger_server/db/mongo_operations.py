@@ -1,12 +1,29 @@
 from datetime import datetime
-from pymongo import MongoClient
 
+from flask_pymongo import PyMongo
+
+mongo = PyMongo()
 
 class MongoOperations:
-    def __init__(self, db_name='mining', collection_name='repositories', uri='mongodb://localhost:27017/'):
-        self.client = MongoClient(uri)
-        self.db = self.client[db_name]
-        self.collection = self.db[collection_name]
+    @property
+    def repositories(self):
+        return mongo.db.repositories
+
+    @property
+    def issues(self):
+        return mongo.db.issues
+
+    @property
+    def prs(self):
+        return mongo.db.pullRequests
+
+    @property
+    def comments(self):
+        return mongo.db.comments
+
+    @property
+    def workflows(self):
+        return mongo.db.workflows
 
     def get_repositories(self, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
                          issues=None, pulls=None, workflows=None, watchers=None, page=None, sort=None):
@@ -67,15 +84,15 @@ class MongoOperations:
         skip = (page - 1) * per_page
 
         if page == -1:
-            cursor = self.collection.find(query).sort('data.' + field, sort_order)
+            cursor = self.repositories.find(query).sort('data.' + field, sort_order)
         else:
-            cursor = self.collection.find(query).sort('data.' + field, sort_order).skip(skip).limit(per_page)
+            cursor = self.repositories.find(query).sort('data.' + field, sort_order).skip(skip).limit(per_page)
 
         repositories = list(cursor)
         return repositories
 
     def get_repository(self, full_name):
-        return self.collection.find_one({"_id": full_name})
+        return self.repositories.find_one({"_id": full_name})
 
     def get_issues(self, repo, state=None, date_range=None, page=1, sort=None):
         query = {'repo': repo}
@@ -104,12 +121,46 @@ class MongoOperations:
         skip = (page - 1) * per_page
 
         if page == -1:
-            cursor = self.collection.find(query).sort(field, sort_order)
+            cursor = self.issues.find(query).sort(field, sort_order)
         else:
-            cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+            cursor = self.issues.find(query).sort(field, sort_order).skip(skip).limit(per_page)
 
         issues = list(cursor)
         return issues
+
+    def get_prs(self, repo, state=None, date_range=None, page=1, sort=None):
+        query = {'repo': repo}
+
+        if state:
+            query['state'] = state.upper()
+        if date_range:
+            start_date, end_date = date_range.split(',')
+            s_date = datetime.strptime(start_date, '%Y-%m-%d')
+            e_date = datetime.combine(datetime.strptime(end_date, '%Y-%m-%d').date(), datetime.max.time())
+            query['updatedAt'] = {
+                '$gte': s_date.isoformat(),  # Start of the filter_date
+                '$lt': e_date.isoformat()  # End of the filter_date
+            }
+
+        # Sorting (1 = asc; -1 = desc)
+        sort_order = -1
+        if sort:
+            field, order = sort.split('-')
+            sort_order = 1 if order == 'asc' else -1
+        else:
+            field = 'updatedAt'
+
+        # Pagination
+        per_page = 20  # Define your pagination size
+        skip = (page - 1) * per_page
+
+        if page == -1:
+            cursor = self.prs.find(query).sort(field, sort_order)
+        else:
+            cursor = self.prs.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+
+        prs = list(cursor)
+        return prs
 
     def get_comments(self, repo, number, page=1):
         query = {'repo': repo, 'issue_number': int(number)}
@@ -122,16 +173,13 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        cursor = self.collection.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+        cursor = self.comments.find(query).sort(field, sort_order).skip(skip).limit(per_page)
 
         comments = list(cursor)
         return comments
 
     def get_workflows(self, full_name):
-        return self.collection.find_one({"_id": full_name})
-
-    def close(self):
-        self.client.close()
+        return self.workflows.find_one({"_id": full_name})
 
     def count_repositories(self, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
                            issues=None, pulls=None, workflows=None, watchers=None):
@@ -179,7 +227,7 @@ class MongoOperations:
             min_watchers, max_watchers = watchers.split(',')
             query['data.watchers_count'] = {'$gte': int(min_watchers), '$lte': int(max_watchers)}
 
-        total = self.collection.count_documents(query)
+        total = self.repositories.count_documents(query)
         return total
 
     def count_issues(self, repo, state=None, date_range=None):
@@ -196,13 +244,31 @@ class MongoOperations:
                 '$lt': e_date.isoformat()  # End of the filter_date
             }
 
-        total = self.collection.count_documents(query)
+        total = self.issues.count_documents(query)
+
+        return total
+
+    def count_prs(self, repo, state=None, date_range=None):
+        query = {'repo': repo}
+
+        if state:
+            query['state'] = state.upper()
+        if date_range:
+            start_date, end_date = date_range.split(',')
+            s_date = datetime.strptime(start_date, '%Y-%m-%d')
+            e_date = datetime.combine(datetime.strptime(end_date, '%Y-%m-%d').date(), datetime.max.time())
+            query['updatedAt'] = {
+                '$gte': s_date.isoformat(),  # Start of the filter_date
+                '$lt': e_date.isoformat()  # End of the filter_date
+            }
+
+        total = self.prs.count_documents(query)
 
         return total
 
     def count_issue_comments(self, repo, number=None):
         query = {'repo': repo, 'issue_number': int(number)}
 
-        total = self.collection.count_documents(query)
+        total = self.comments.count_documents(query)
 
         return total

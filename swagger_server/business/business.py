@@ -5,52 +5,75 @@ from werkzeug.exceptions import NotFound, BadRequest
 from swagger_server.db.mongo_operations import MongoOperations
 from swagger_server.models import IssuesList, CommentsList, RepositoriesList, Metrics, Repository, Statistics, \
     StatisticsPulls, StatisticsIssues, StatisticsWorkflows, StatisticsRepositories
-
 from swagger_server.utils import util, validation, mapper
 
+mongo_ops = MongoOperations()
 
-def elaborate_issues(full_name, type_issue, state,
+
+def elaborate_issues(full_name, state,
                      date_range, page, sort=None):
     """
-    Retrieves a list of issues or pull requests from a MongoDB collection based on specified criteria.
+    Retrieves a list of issues from a mongoDB collection based on specified criteria.
 
     :param full_name: Full name of the repository.
     :type full_name: str
-    :param type_issue: Type of issue ("issues" or "pulls").
-    :type type_issue: str
-    :param state: State of the issues ("OPEN", "CLOSED", or "MERGED" for pulls).
+    :param state: State of the issues ("OPEN" or "CLOSED").
     :type state: str
-    :param date_range: Date range filter for issues and pull requests (e.g., "2023-01-01,2023-12-31").
+    :param date_range: Date range filter for issues (e.g., "2023-01-01,2023-12-31").
     :type date_range: str
     :param page: Page number for pagination.
     :type page: int
     :param sort: Sorting criteria.
     :type sort: str, optional
-    :return: List of issues or pull requests with pagination information.
+    :return: List of issues with pagination information.
     :rtype: IssuesList
     """
-    mongo_ops = MongoOperations(collection_name=("issues" if type_issue == "issues" else "pullRequests"))
+    issues_data = mongo_ops.get_issues(repo=full_name, state=state, date_range=date_range, page=page,
+                                       sort=sort)
 
-    try:
-        issues_data = mongo_ops.get_issues(repo=full_name, state=state, date_range=date_range, page=page,
-                                           sort=sort)
+    total = mongo_ops.count_issues(repo=full_name, state=state, date_range=date_range)
 
-        total = mongo_ops.count_issues(repo=full_name, state=state, date_range=date_range)
+    issues = [
+        mapper.map_response_to_issue(i)
+        for i in issues_data
+    ]
 
-        issues = [
-            mapper.map_response_to_issue(i)
-            for i in issues_data
-        ]
+    return IssuesList(items=issues, page=page, total_elements=total)
 
-        return IssuesList(items=issues, page=page, total_elements=total)
+def elaborate_prs(full_name, state,
+                  date_range, page, sort=None):
+    """
+    Retrieves a list of pull requests from a mongoDB collection based on specified criteria.
 
-    finally:
-        mongo_ops.close()
+    :param full_name: Full name of the repository.
+    :type full_name: str
+    :param state: State of the pulls ("OPEN", "CLOSED", or "MERGED").
+    :type state: str
+    :param date_range: Date range filter for pull requests (e.g., "2023-01-01,2023-12-31").
+    :type date_range: str
+    :param page: Page number for pagination.
+    :type page: int
+    :param sort: Sorting criteria.
+    :type sort: str, optional
+    :return: List of pull requests with pagination information.
+    :rtype: IssuesList
+    """
+    prs_data = mongo_ops.get_prs(repo=full_name, state=state, date_range=date_range, page=page,
+                                       sort=sort)
+
+    total = mongo_ops.count_prs(repo=full_name, state=state, date_range=date_range)
+
+    prs = [
+        mapper.map_response_to_issue(i)
+        for i in prs_data
+    ]
+
+    return IssuesList(items=prs, page=page, total_elements=total)
 
 
 def elaborate_issue_comments(full_name, issue_number, page):
     """
-    Retrieves comments associated with a specific issue from a MongoDB collection.
+    Retrieves comments associated with a specific issue from a mongoDB collection.
 
     :param full_name: Full name of the repository.
     :type full_name: str
@@ -61,27 +84,23 @@ def elaborate_issue_comments(full_name, issue_number, page):
     :return: List of comments for the specified issue with pagination information.
     :rtype: CommentsList
     """
-    mongo_ops = MongoOperations(collection_name="comments")
-    try:
-        comments_data = mongo_ops.get_comments(repo=full_name, number=issue_number, page=page)
+    comments_data = mongo_ops.get_comments(repo=full_name, number=issue_number, page=page)
 
-        total = mongo_ops.count_issue_comments(repo=full_name, number=issue_number)
+    total = mongo_ops.count_issue_comments(repo=full_name, number=issue_number)
 
-        comments = [
-            mapper.map_response_to_comment(c)
-            for c in comments_data
-        ]
+    comments = [
+        mapper.map_response_to_comment(c)
+        for c in comments_data
+    ]
 
-        return CommentsList(items=comments, page=page, total_elements=total)
-    finally:
-        mongo_ops.close()
+    return CommentsList(items=comments, page=page, total_elements=total)
 
 
 def elaborate_repositories(name=None, language=None, is_private=None, date_range=None,
                            stars=None, forks=None, issues=None, pulls=None,
                            workflows=None, watchers=None, page=None, sort=None) -> RepositoriesList:
     """
-    Retrieves a list of repositories from a MongoDB collection based on specified criteria.
+    Retrieves a list of repositories from a mongoDB collection based on specified criteria.
 
     :param name: Repository name filter.
     :type name: str, optional
@@ -110,30 +129,27 @@ def elaborate_repositories(name=None, language=None, is_private=None, date_range
     :return: List of repositories matching the specified criteria with pagination information.
     :rtype: RepositoriesList
     """
-    mongo_ops = MongoOperations()
-    try:
-        repositories_data = mongo_ops.get_repositories(name=name, language=language, is_private=is_private,
-                                                       date_range=date_range, stars=stars, forks=forks, issues=issues,
-                                                       pulls=pulls, workflows=workflows, watchers=watchers, page=page,
-                                                       sort=sort)
 
-        total = mongo_ops.count_repositories(name=name, language=language, is_private=is_private,
-                                             date_range=date_range, stars=stars, forks=forks, issues=issues,
-                                             pulls=pulls, workflows=workflows, watchers=watchers)
+    repositories_data = mongo_ops.get_repositories(name=name, language=language, is_private=is_private,
+                                                   date_range=date_range, stars=stars, forks=forks, issues=issues,
+                                                   pulls=pulls, workflows=workflows, watchers=watchers, page=page,
+                                                   sort=sort)
 
-        repositories = [
-            mapper.map_response_to_repository(repo)
-            for repo in repositories_data
-        ]
+    total = mongo_ops.count_repositories(name=name, language=language, is_private=is_private,
+                                         date_range=date_range, stars=stars, forks=forks, issues=issues,
+                                         pulls=pulls, workflows=workflows, watchers=watchers)
 
-        return RepositoriesList(items=repositories, total_elements=total, page=page)
-    finally:
-        mongo_ops.close()
+    repositories = [
+        mapper.map_response_to_repository(repo)
+        for repo in repositories_data
+    ]
+
+    return RepositoriesList(items=repositories, total_elements=total, page=page)
 
 
 def elaborate_repository(full_name):
     """
-    Retrieves information about a specific repository from a MongoDB collection.
+    Retrieves information about a specific repository from a mongoDB collection.
 
     :param full_name: Full name of the repository.
     :type full_name: str
@@ -141,21 +157,17 @@ def elaborate_repository(full_name):
     :rtype: Repository
     :raises NotFound: If the repository does not exist.
     """
-    mongo_ops = MongoOperations()
-    try:
-        repositories_data = mongo_ops.get_repository(full_name)
+    repositories_data = mongo_ops.get_repository(full_name)
 
-        if repositories_data is None:
-            raise NotFound
+    if repositories_data is None:
+        raise NotFound
 
-        return mapper.map_response_to_repository(repositories_data)
-    finally:
-        mongo_ops.close()
+    return mapper.map_response_to_repository(repositories_data)
 
 
 def elaborate_workflows(full_name):
     """
-    Retrieves workflows associated with a specific repository from a MongoDB collection.
+    Retrieves workflows associated with a specific repository from a mongoDB collection.
 
     :param full_name: Full name of the repository.
     :type full_name: str
@@ -163,21 +175,17 @@ def elaborate_workflows(full_name):
     :rtype: List[Workflow]
     :raises NotFound: If the repository does not exist.
     """
-    mongo_ops = MongoOperations(collection_name="workflows")
-    try:
-        if not mongo_ops.get_repository(full_name):
-            raise NotFound
+    if not mongo_ops.get_repository(full_name):
+        raise NotFound
 
-        workflows_data = mongo_ops.get_workflows(full_name)
+    workflows_data = mongo_ops.get_workflows(full_name)
 
-        workflows = [
-            mapper.map_response_to_workflow(w)
-            for w in workflows_data.get('workflows', [])
-        ]
+    workflows = [
+        mapper.map_response_to_workflow(w)
+        for w in workflows_data.get('workflows', [])
+    ]
 
-        return workflows
-    finally:
-        mongo_ops.close()
+    return workflows
 
 
 def elaborate_statistics(date_range_stats, name, language, is_private, date_range, stars,
@@ -248,33 +256,29 @@ def elaborate_metrics_repositories():
     :return: Metrics computed across all repositories.
     :rtype: Metrics
     """
-    mongo_ops = MongoOperations()
-    try:
-        repositories = elaborate_repositories(page=-1).items
+    repositories = elaborate_repositories(page=-1).items
 
-        languages = set()
-        maxes = {
-            'stars_count': 0,
-            'watchers_count': 0,
-            'forks_count': 0,
-            'issue_count': 0,
-            'pr_count': 0,
-            'workflows_count': 0
-        }
+    languages = set()
+    maxes = {
+        'stars_count': 0,
+        'watchers_count': 0,
+        'forks_count': 0,
+        'issue_count': 0,
+        'pr_count': 0,
+        'workflows_count': 0
+    }
 
-        for repo in repositories:
-            repo_dict = repo.to_dict()
-            languages.add(repo.language)
+    for repo in repositories:
+        repo_dict = repo.to_dict()
+        languages.add(repo.language)
 
-            for key in maxes.keys():
-                maxes[key] = max(maxes[key], repo_dict[key])
+        for key in maxes.keys():
+            maxes[key] = max(maxes[key], repo_dict[key])
 
-        return Metrics(
-            languages=list(languages),
-            maxes=maxes
-        )
-    finally:
-        mongo_ops.close()
+    return Metrics(
+        languages=list(languages),
+        maxes=maxes
+    )
 
 
 def __compute_stats(repos: List[Repository], date_range):
@@ -315,14 +319,14 @@ def __get_stats(full_name, date_range):
     :rtype: Tuple[StatisticsIssues, StatisticsPulls, StatisticsWorkflows, StatisticsRepositories]
     """
     issues_data = {
-        "OPEN": elaborate_issues(full_name, "issues", "OPEN", date_range, -1).items,
-        "CLOSED": elaborate_issues(full_name, "issues", "CLOSED", date_range, -1).items,
+        "OPEN": elaborate_issues(full_name, "OPEN", date_range, -1).items,
+        "CLOSED": elaborate_issues(full_name, "CLOSED", date_range, -1).items,
     }
 
     pulls_data = {
-        "OPEN": elaborate_issues(full_name, "pulls", "OPEN", date_range, -1).items,
-        "CLOSED": elaborate_issues(full_name, "pulls", "CLOSED", date_range, -1).items,
-        "MERGED": elaborate_issues(full_name, "pulls", "MERGED", date_range, -1).items
+        "OPEN": elaborate_prs(full_name, "OPEN", date_range, -1).items,
+        "CLOSED": elaborate_prs(full_name, "CLOSED", date_range, -1).items,
+        "MERGED": elaborate_prs(full_name, "MERGED", date_range, -1).items
     }
 
     # Compute statistics for issues

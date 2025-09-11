@@ -55,7 +55,7 @@ class TestRepositoryController(BaseTestCase):
     def test_get_statistics(self):
         """Test GET /repositories/statistics"""
         response = self.client.get('/repositories/statistics', query_string={
-            'dateRangeStats': '2023-01-01,2023-01-31'
+            'dateRangeStats': '2014-01-01,2014-01-31'
         })
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
@@ -63,7 +63,7 @@ class TestRepositoryController(BaseTestCase):
 
     def test_get_statistics_invalid_date_range(self):
         response = self.client.get('/repositories/statistics', query_string={
-            'dateRangeStats': '2023-01-01,2023-12-31'
+            'dateRangeStats': '2014-01-01,2014-12-31'
         })
         self.assertEqual(response.status_code, 400)
 
@@ -73,7 +73,7 @@ class TestRepositoryController(BaseTestCase):
     def test_get_statistics_of_repository(self):
         """Test GET /repositories/{owner}/{name}/statistics"""
         response = self.client.get('/repositories/owner_example/name_example/statistics', query_string={
-            'dateRange': '2023-01-01,2023-01-31'
+            'dateRange': '2014-01-01,2014-01-31'
         })
         self.assertEqual(response.status_code, 404)
         data = response.get_json()
