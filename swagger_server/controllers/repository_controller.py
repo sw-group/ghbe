@@ -187,10 +187,12 @@ def register_repository_routes(app):
     # /repositories
     @app.route("/repositories", methods=["GET"])
     def repositories_route():
+        is_private_str = request.args.get("isPrivate")
+        is_private = is_private_str.lower() == "true" if is_private_str else None
         return jsonify(get_repositories(
             name=request.args.get("name"),
             language=request.args.get("language"),
-            is_private=request.args.get("isPrivate") == "true",
+            is_private=is_private,
             date_range=request.args.get("dateRange"),
             stars=request.args.get("stars"),
             forks=request.args.get("forks"),
@@ -205,11 +207,13 @@ def register_repository_routes(app):
     # /repositories/statistics
     @app.route("/repositories/statistics", methods=["GET"])
     def repositories_statistics_route():
+        is_private_str = request.args.get("isPrivate")
+        is_private = is_private_str.lower() == "true" if is_private_str else None
         return jsonify(get_statistics(
             date_range_stats=request.args.get("dateRangeStats"),
             name=request.args.get("name"),
             language=request.args.get("language"),
-            is_private=request.args.get("isPrivate") == "true",
+            is_private=is_private,
             date_range=request.args.get("dateRange"),
             stars=request.args.get("stars"),
             forks=request.args.get("forks"),
