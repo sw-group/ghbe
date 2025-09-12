@@ -31,9 +31,6 @@ jobs:
           pip install -r requirements.txt
           pip install -r test-requirements.txt
 
-      - name: Run insert_pylint_directives.py script
-        run: python scripts/insert_pylint_directives.py
-
       - name: Analysing the code with pylint
         run: |
           FILES=$(git ls-files 'swagger_server/test/*.py')
