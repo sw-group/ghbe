@@ -7,8 +7,6 @@ from swagger_server.models import IssuesList, CommentsList, RepositoriesList, Me
     StatisticsPulls, StatisticsIssues, StatisticsWorkflows, StatisticsRepositories
 from swagger_server.utils import util, validation, mapper
 
-mongo_ops = MongoOperations()
-
 
 def elaborate_issues(full_name, state,
                      date_range, page, sort=None):
@@ -28,10 +26,10 @@ def elaborate_issues(full_name, state,
     :return: List of issues with pagination information.
     :rtype: IssuesList
     """
-    issues_data = mongo_ops.get_issues(repo=full_name, state=state, date_range=date_range, page=page,
+    issues_data = MongoOperations.get_issues(repo=full_name, state=state, date_range=date_range, page=page,
                                        sort=sort)
 
-    total = mongo_ops.count_issues(repo=full_name, state=state, date_range=date_range)
+    total = MongoOperations.count_issues(repo=full_name, state=state, date_range=date_range)
 
     issues = [
         mapper.map_response_to_issue(i)
@@ -58,10 +56,10 @@ def elaborate_prs(full_name, state,
     :return: List of pull requests with pagination information.
     :rtype: IssuesList
     """
-    prs_data = mongo_ops.get_prs(repo=full_name, state=state, date_range=date_range, page=page,
+    prs_data = MongoOperations.get_prs(repo=full_name, state=state, date_range=date_range, page=page,
                                        sort=sort)
 
-    total = mongo_ops.count_prs(repo=full_name, state=state, date_range=date_range)
+    total = MongoOperations.count_prs(repo=full_name, state=state, date_range=date_range)
 
     prs = [
         mapper.map_response_to_issue(i)
@@ -84,9 +82,9 @@ def elaborate_issue_comments(full_name, issue_number, page):
     :return: List of comments for the specified issue with pagination information.
     :rtype: CommentsList
     """
-    comments_data = mongo_ops.get_comments(repo=full_name, number=issue_number, page=page)
+    comments_data = MongoOperations.get_comments(repo=full_name, number=issue_number, page=page)
 
-    total = mongo_ops.count_issue_comments(repo=full_name, number=issue_number)
+    total = MongoOperations.count_issue_comments(repo=full_name, number=issue_number)
 
     comments = [
         mapper.map_response_to_comment(c)
@@ -130,12 +128,12 @@ def elaborate_repositories(name=None, language=None, is_private=None, date_range
     :rtype: RepositoriesList
     """
 
-    repositories_data = mongo_ops.get_repositories(name=name, language=language, is_private=is_private,
+    repositories_data = MongoOperations.get_repositories(name=name, language=language, is_private=is_private,
                                                    date_range=date_range, stars=stars, forks=forks, issues=issues,
                                                    pulls=pulls, workflows=workflows, watchers=watchers, page=page,
                                                    sort=sort)
 
-    total = mongo_ops.count_repositories(name=name, language=language, is_private=is_private,
+    total = MongoOperations.count_repositories(name=name, language=language, is_private=is_private,
                                          date_range=date_range, stars=stars, forks=forks, issues=issues,
                                          pulls=pulls, workflows=workflows, watchers=watchers)
 
@@ -157,7 +155,7 @@ def elaborate_repository(full_name):
     :rtype: Repository
     :raises NotFound: If the repository does not exist.
     """
-    repositories_data = mongo_ops.get_repository(full_name)
+    repositories_data = MongoOperations.get_repository(full_name)
 
     if repositories_data is None:
         raise NotFound
@@ -175,10 +173,10 @@ def elaborate_workflows(full_name):
     :rtype: List[Workflow]
     :raises NotFound: If the repository does not exist.
     """
-    if not mongo_ops.get_repository(full_name):
+    if not MongoOperations.get_repository(full_name):
         raise NotFound
 
-    workflows_data = mongo_ops.get_workflows(full_name)
+    workflows_data = MongoOperations.get_workflows(full_name)
 
     workflows = [
         mapper.map_response_to_workflow(w)

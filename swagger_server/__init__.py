@@ -2,9 +2,9 @@ import connexion
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
 
+import swagger_server.db.database
 from swagger_server.controllers.gui_controller import register_gui_routes
 from swagger_server.controllers.repository_controller import register_repository_routes
-from swagger_server.db.mongo_operations import mongo
 from swagger_server.encoder import JSONEncoder
 
 def create_app():
@@ -13,7 +13,7 @@ def create_app():
     connex_app.app.json_encoder = JSONEncoder
 
     connex_app.app.config['MONGO_URI'] = "mongodb://localhost:27017/mining"
-    mongo.init_app(connex_app.app)
+    swagger_server.db.database.mongo.init_app(connex_app.app)
 
     # Load API from swagger.yaml
     connex_app.add_api(

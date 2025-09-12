@@ -1,20 +1,33 @@
-import mongomock
+from unittest.mock import patch
+
 from flask_testing import TestCase
+from mongomock import MongoClient
+
 from swagger_server import create_app
+
+class PyMongoMock(MongoClient):
+    """Mock compatibile con PyMongo che usa mongomock sotto"""
+    def __init__(self):
+        super().__init__()
+        # usa un db fittizio "testdb"
+        self.db = self.client["test"]
+
+    def init_app(self, app):
+        # Non fa nulla nei test, serve solo per compatibilità
+        return self
 
 class BaseTestCase(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        """Setup una volta per tutte le classi di test"""
-        cls.mongo_client = mongomock.MongoClient()
-
     def create_app(self):
+        # Patch del global `mongo` usato da tutto il codice
+        patcher = patch("swagger_server.db.database.mongo", new_callable=PyMongoMock)
+        self.addCleanup(patcher.stop)
+        self.mongo = patcher.start()
+
         """Required by Flask-Testing: return a Flask app instance"""
         app = create_app().app
         app.config['TESTING'] = True
         app.config['PROPAGATE_EXCEPTIONS'] = True
-        app.mongo = self.mongo_client
         return app
 
     def assert_json_response(self, response, expected_status_code=200):

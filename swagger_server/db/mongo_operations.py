@@ -1,31 +1,12 @@
 from datetime import datetime
 
-from flask_pymongo import PyMongo
+import swagger_server.db.database
 
-mongo = PyMongo()
 
 class MongoOperations:
-    @property
-    def repositories(self):
-        return mongo.db.repositories
-
-    @property
-    def issues(self):
-        return mongo.db.issues
-
-    @property
-    def prs(self):
-        return mongo.db.pullRequests
-
-    @property
-    def comments(self):
-        return mongo.db.comments
-
-    @property
-    def workflows(self):
-        return mongo.db.workflows
-
-    def get_repositories(self, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
+    
+    @staticmethod
+    def get_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
                          issues=None, pulls=None, workflows=None, watchers=None, page=None, sort=None):
         query = {}
 
@@ -84,17 +65,19 @@ class MongoOperations:
         skip = (page - 1) * per_page
 
         if page == -1:
-            cursor = self.repositories.find(query).sort('data.' + field, sort_order)
+            cursor = swagger_server.db.database.mongo.db.repositories.find(query).sort('data.' + field, sort_order)
         else:
-            cursor = self.repositories.find(query).sort('data.' + field, sort_order).skip(skip).limit(per_page)
+            cursor = swagger_server.db.database.mongo.db.repositories.find(query).sort('data.' + field, sort_order).skip(skip).limit(per_page)
 
         repositories = list(cursor)
         return repositories
 
-    def get_repository(self, full_name):
-        return self.repositories.find_one({"_id": full_name})
+    @staticmethod
+    def get_repository(full_name):
+        return swagger_server.db.database.mongo.db.repositories.find_one({"_id": full_name})
 
-    def get_issues(self, repo, state=None, date_range=None, page=1, sort=None):
+    @staticmethod
+    def get_issues(repo, state=None, date_range=None, page=1, sort=None):
         query = {'repo': repo}
 
         if state:
@@ -121,14 +104,15 @@ class MongoOperations:
         skip = (page - 1) * per_page
 
         if page == -1:
-            cursor = self.issues.find(query).sort(field, sort_order)
+            cursor = swagger_server.db.database.mongo.db.issues.find(query).sort(field, sort_order)
         else:
-            cursor = self.issues.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+            cursor = swagger_server.db.database.mongo.db.issues.find(query).sort(field, sort_order).skip(skip).limit(per_page)
 
         issues = list(cursor)
         return issues
 
-    def get_prs(self, repo, state=None, date_range=None, page=1, sort=None):
+    @staticmethod
+    def get_prs(repo, state=None, date_range=None, page=1, sort=None):
         query = {'repo': repo}
 
         if state:
@@ -155,14 +139,15 @@ class MongoOperations:
         skip = (page - 1) * per_page
 
         if page == -1:
-            cursor = self.prs.find(query).sort(field, sort_order)
+            cursor = swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order)
         else:
-            cursor = self.prs.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+            cursor = swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order).skip(skip).limit(per_page)
 
         prs = list(cursor)
         return prs
 
-    def get_comments(self, repo, number, page=1):
+    @staticmethod
+    def get_comments(repo, number, page=1):
         query = {'repo': repo, 'issue_number': int(number)}
 
         # Sorting (1 = asc; -1 = desc)
@@ -173,15 +158,17 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        cursor = self.comments.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+        cursor = swagger_server.db.database.mongo.db.comments.find(query).sort(field, sort_order).skip(skip).limit(per_page)
 
         comments = list(cursor)
         return comments
 
-    def get_workflows(self, full_name):
-        return self.workflows.find_one({"_id": full_name})
+    @staticmethod
+    def get_workflows(full_name):
+        return swagger_server.db.database.mongo.db.workflows.find_one({"_id": full_name})
 
-    def count_repositories(self, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
+    @staticmethod
+    def count_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
                            issues=None, pulls=None, workflows=None, watchers=None):
         query = {}
 
@@ -227,10 +214,11 @@ class MongoOperations:
             min_watchers, max_watchers = watchers.split(',')
             query['data.watchers_count'] = {'$gte': int(min_watchers), '$lte': int(max_watchers)}
 
-        total = self.repositories.count_documents(query)
+        total = swagger_server.db.database.mongo.db.repositories.count_documents(query)
         return total
 
-    def count_issues(self, repo, state=None, date_range=None):
+    @staticmethod
+    def count_issues(repo, state=None, date_range=None):
         query = {'repo': repo}
 
         if state:
@@ -244,11 +232,12 @@ class MongoOperations:
                 '$lt': e_date.isoformat()  # End of the filter_date
             }
 
-        total = self.issues.count_documents(query)
+        total = swagger_server.db.database.mongo.db.issues.count_documents(query)
 
         return total
 
-    def count_prs(self, repo, state=None, date_range=None):
+    @staticmethod
+    def count_prs(repo, state=None, date_range=None):
         query = {'repo': repo}
 
         if state:
@@ -262,13 +251,14 @@ class MongoOperations:
                 '$lt': e_date.isoformat()  # End of the filter_date
             }
 
-        total = self.prs.count_documents(query)
+        total = swagger_server.db.database.mongo.db.prs.count_documents(query)
 
         return total
 
-    def count_issue_comments(self, repo, number=None):
+    @staticmethod
+    def count_issue_comments(repo, number=None):
         query = {'repo': repo, 'issue_number': int(number)}
 
-        total = self.comments.count_documents(query)
+        total = swagger_server.db.database.mongo.db.comments.count_documents(query)
 
         return total
