@@ -1,16 +1,16 @@
 # coding: utf-8
 
 from __future__ import absolute_import
-from datetime import date, datetime  # noqa: F401
 
+from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
+from swagger_server import util
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.statistics_issues import StatisticsIssues  # noqa: F401,E501
 from swagger_server.models.statistics_pulls import StatisticsPulls  # noqa: F401,E501
 from swagger_server.models.statistics_repositories import StatisticsRepositories  # noqa: F401,E501
 from swagger_server.models.statistics_workflows import StatisticsWorkflows  # noqa: F401,E501
-from swagger_server import util
 
 
 class Statistics(Model):
@@ -18,7 +18,9 @@ class Statistics(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, pulls: StatisticsPulls=None, issues: StatisticsIssues=None, workflows: StatisticsWorkflows=None, repositories: StatisticsRepositories=None):  # noqa: E501
+
+    def __init__(self, pulls: StatisticsPulls = None, issues: StatisticsIssues = None,
+                 workflows: StatisticsWorkflows = None, repositories: StatisticsRepositories = None):  # noqa: E501
         """Statistics - a model defined in Swagger
 
         :param pulls: The pulls of this Statistics.  # noqa: E501

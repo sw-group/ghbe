@@ -1,10 +1,11 @@
+from flask import jsonify, request
+
 from swagger_server.business import business
 from swagger_server.models.comments_list import CommentsList  # noqa: E501
 from swagger_server.models.issues_list import IssuesList  # noqa: E501
 from swagger_server.models.repositories_list import RepositoriesList  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
-from flask import jsonify, request
 
 
 def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
@@ -51,7 +52,8 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
     :rtype: IssuesList
     """
     repo_full_name = f'{owner}/{name}'
-    values: IssuesList = business.elaborate_issues(repo_full_name, state, date_range, page, sort) if issue_type == "issues" \
+    values: IssuesList = business.elaborate_issues(repo_full_name, state, date_range, page,
+                                                   sort) if issue_type == "issues" \
         else business.elaborate_prs(repo_full_name, state, date_range, page, sort)
     return values.to_dict()
 
@@ -126,8 +128,8 @@ def get_workflows_of_repo(owner, name):  # noqa: E501
     return [workflow.to_dict() for workflow in workflows]
 
 
-def get_statistics(date_range_stats, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None, issues=None,
-                   pulls=None, workflows=None, watchers=None):  # noqa: E501
+def get_statistics(date_range_stats, name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
+                   issues=None, pulls=None, workflows=None, watchers=None):  # noqa: E501
     """Compute the statistics of all the filtered repositories
 
     Compute the statistics of all the filtered repositories.
@@ -264,4 +266,3 @@ def register_repository_routes(app):
             name,
             date_range=request.args.get("dateRange")
         ))
-

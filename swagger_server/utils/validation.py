@@ -1,5 +1,7 @@
+from datetime import datetime
+
+
 def validate_date_range(date_range):
-    from datetime import datetime
     try:
         start_date_str, end_date_str = date_range.split(',')
         start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
@@ -19,4 +21,3 @@ def validate_date_range(date_range):
         return None
     except ValueError:
         return "Invalid dateRange format"
-

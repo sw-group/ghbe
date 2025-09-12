@@ -3,6 +3,7 @@ from flask import jsonify
 from swagger_server.business import business
 from swagger_server.models.metrics import Metrics  # noqa: E501
 
+
 def get_metrics():  # noqa: E501
     """Get the metrics for filter configuration
 

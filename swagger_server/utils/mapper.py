@@ -75,4 +75,3 @@ def map_author(author):
         name=author.get('login'),
         url=author.get('url')
     )
-

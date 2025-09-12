@@ -7,6 +7,7 @@ from swagger_server.controllers.gui_controller import register_gui_routes
 from swagger_server.controllers.repository_controller import register_repository_routes
 from swagger_server.encoder import JSONEncoder
 
+
 def create_app():
     # Create the connexion app
     connex_app = connexion.App(__name__, specification_dir='./swagger')

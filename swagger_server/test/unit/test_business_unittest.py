@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
+
 from werkzeug.exceptions import NotFound, BadRequest
-import swagger_server.business.business as business
 
 from swagger_server.business.business import (
     elaborate_issues,
@@ -119,7 +119,8 @@ class TestBusinessLayerBlackBox(unittest.TestCase):
     @patch('swagger_server.business.business.validation.validate_date_range', return_value=None)
     def test_elaborate_statistics_success(self, mock_validate, mock_repos):
         mock_repos.return_value.items = []
-        result = elaborate_statistics("2023-01-01,2023-12-31", None, None, None, None, None, None, None, None, None, None)
+        result = elaborate_statistics("2023-01-01,2023-12-31", None, None, None, None, None, None, None, None, None,
+                                      None)
         self.assertIsInstance(result, Statistics)
 
     @patch('swagger_server.business.business.elaborate_repositories')

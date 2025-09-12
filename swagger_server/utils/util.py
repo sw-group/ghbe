@@ -1,8 +1,8 @@
 from collections import defaultdict
+from typing import List, Dict
 
 from swagger_server.models import IssueLabels, Issue, Statistics, Workflow
 from swagger_server.models import StatisticsIssues, StatisticsPulls, StatisticsRepositories, StatisticsWorkflows
-from typing import List, Dict
 
 
 def generate_date_count_map(issue_list: List[Issue]) -> Dict[str, int]:
@@ -135,6 +135,7 @@ def __check_labels(issue_labels: List[IssueLabels], labels: List[str], label_cou
                 label_count_map[label] += 1
                 return True
     return False
+
 
 def __check_body_and_title(issue: Issue, labels: List[str], label_count_map: Dict[str, int]):
     """

@@ -4,7 +4,6 @@ import swagger_server.db.database
 
 
 class MongoOperations:
-    
     @staticmethod
     def get_repositories(name=None, language=None, is_private=None, date_range=None, stars=None, forks=None,
                          issues=None, pulls=None, workflows=None, watchers=None, page=None, sort=None):
@@ -67,7 +66,8 @@ class MongoOperations:
         if page == -1:
             cursor = swagger_server.db.database.mongo.db.repositories.find(query).sort('data.' + field, sort_order)
         else:
-            cursor = swagger_server.db.database.mongo.db.repositories.find(query).sort('data.' + field, sort_order).skip(skip).limit(per_page)
+            cursor = (swagger_server.db.database.mongo.db.repositories.find(query).sort('data.' + field, sort_order)
+                                    .skip(skip).limit(per_page))
 
         repositories = list(cursor)
         return repositories
@@ -106,7 +106,8 @@ class MongoOperations:
         if page == -1:
             cursor = swagger_server.db.database.mongo.db.issues.find(query).sort(field, sort_order)
         else:
-            cursor = swagger_server.db.database.mongo.db.issues.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+            cursor = (swagger_server.db.database.mongo.db.issues.find(query).sort(field, sort_order)
+                      .skip(skip).limit(per_page))
 
         issues = list(cursor)
         return issues
@@ -141,7 +142,8 @@ class MongoOperations:
         if page == -1:
             cursor = swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order)
         else:
-            cursor = swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+            cursor = (swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order)
+                      .skip(skip).limit(per_page))
 
         prs = list(cursor)
         return prs
@@ -158,7 +160,8 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        cursor = swagger_server.db.database.mongo.db.comments.find(query).sort(field, sort_order).skip(skip).limit(per_page)
+        cursor = (swagger_server.db.database.mongo.db.comments.find(query).sort(field, sort_order)
+                  .skip(skip).limit(per_page))
 
         comments = list(cursor)
         return comments

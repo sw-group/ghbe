@@ -32,6 +32,7 @@ disable=
 [FORMAT]
 # Maximum number of characters on a single line.
 max-line-length=150
+ignore-long-lines=.*""".*
 
 [BASIC]
 # Regular expression matching correct constant names

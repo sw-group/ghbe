@@ -1,12 +1,12 @@
 # coding: utf-8
 
 from __future__ import absolute_import
-from datetime import date, datetime  # noqa: F401
 
+from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
-from swagger_server.models.base_model_ import Model
 from swagger_server import util
+from swagger_server.models.base_model_ import Model
 
 
 class Repository(Model):
@@ -14,7 +14,11 @@ class Repository(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, full_name: str=None, url: str=None, private: bool=False, language: str=None, created_at: datetime=None, updated_at: datetime=None, pushed_at: datetime=None, stars_count: int=None, forks_count: int=None, watchers_count: int=None, issue_count: int=None, pr_count: int=None, workflows_count: int=None):  # noqa: E501
+
+    def __init__(self, full_name: str = None, url: str = None, private: bool = False, language: str = None,
+                 created_at: datetime = None, updated_at: datetime = None, pushed_at: datetime = None,
+                 stars_count: int = None, forks_count: int = None, watchers_count: int = None, issue_count: int = None,
+                 pr_count: int = None, workflows_count: int = None):  # noqa: E501
         """Repository - a model defined in Swagger
 
         :param full_name: The full_name of this Repository.  # noqa: E501

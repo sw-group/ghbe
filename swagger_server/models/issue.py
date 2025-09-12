@@ -1,14 +1,14 @@
 # coding: utf-8
 
 from __future__ import absolute_import
-from datetime import date, datetime  # noqa: F401
 
+from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
-from swagger_server.models.base_model_ import Model
-from swagger_server.models.author import Author  # noqa: F401,E501
-from swagger_server.models.issue_labels import IssueLabels  # noqa: F401,E501
 from swagger_server import util
+from swagger_server.models.author import Author  # noqa: F401,E501
+from swagger_server.models.base_model_ import Model
+from swagger_server.models.issue_labels import IssueLabels  # noqa: F401,E501
 
 
 class Issue(Model):
@@ -16,7 +16,10 @@ class Issue(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, number: int=None, repo: str=None, title: str=None, url: str=None, state: str=None, body: str=None, author: Author=None, labels: List[IssueLabels]=None, comments: int=None, created_at: datetime=None, updated_at: datetime=None, closed_at: datetime=None):  # noqa: E501
+
+    def __init__(self, number: int = None, repo: str = None, title: str = None, url: str = None, state: str = None,
+                 body: str = None, author: Author = None, labels: List[IssueLabels] = None, comments: int = None,
+                 created_at: datetime = None, updated_at: datetime = None, closed_at: datetime = None):  # noqa: E501
         """Issue - a model defined in Swagger
 
         :param number: The number of this Issue.  # noqa: E501
@@ -202,8 +205,7 @@ class Issue(Model):
         allowed_values = ["OPEN", "CLOSED"]  # noqa: E501
         if state not in allowed_values:
             raise ValueError(
-                "Invalid value for `state` ({0}), must be one of {1}"
-                .format(state, allowed_values)
+                f"Invalid value for `state` ({state}), must be one of {allowed_values}"
             )
 
         self._state = state

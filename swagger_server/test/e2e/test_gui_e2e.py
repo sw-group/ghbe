@@ -1,6 +1,8 @@
 import unittest
-from swagger_server.test import BaseTestCase
+
 from swagger_server.business.business import elaborate_metrics_repositories
+from swagger_server.test import BaseTestCase
+
 
 class TestGuiControllerEndToEnd(BaseTestCase):
     """END-TO-END TESTS - Full stack including business layer"""

@@ -1,12 +1,12 @@
 # coding: utf-8
 
 from __future__ import absolute_import
-from datetime import date, datetime  # noqa: F401
 
+from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
-from swagger_server.models.base_model_ import Model
 from swagger_server import util
+from swagger_server.models.base_model_ import Model
 
 
 class Workflow(Model):
@@ -14,7 +14,10 @@ class Workflow(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, name: str=None, path: str=None, url: str=None, state: str=None, created_at: datetime=None, updated_at: datetime=None, file_url: str=None, size: str=None, lines: float=None):  # noqa: E501
+
+    def __init__(self, id: int = None, name: str = None, path: str = None, url: str = None, state: str = None,
+                 created_at: datetime = None, updated_at: datetime = None, file_url: str = None, size: str = None,
+                 lines: float = None):  # noqa: E501
         """Workflow - a model defined in Swagger
 
         :param id: The id of this Workflow.  # noqa: E501

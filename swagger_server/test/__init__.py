@@ -5,8 +5,10 @@ from mongomock import MongoClient
 
 from swagger_server import create_app
 
+
 class PyMongoMock(MongoClient):
     """Mock compatibile con PyMongo che usa mongomock sotto"""
+
     def __init__(self):
         super().__init__()
         # usa un db fittizio "testdb"
@@ -15,6 +17,7 @@ class PyMongoMock(MongoClient):
     def init_app(self, app):
         # Non fa nulla nei test, serve solo per compatibilità
         return self
+
 
 class BaseTestCase(TestCase):
 

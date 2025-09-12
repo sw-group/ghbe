@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 from swagger_server.test import BaseTestCase
 
+
 class TestRepositoryController(BaseTestCase):
     """RepositoryController integration test stubs"""
 
@@ -82,4 +83,5 @@ class TestRepositoryController(BaseTestCase):
 
 if __name__ == '__main__':
     import unittest
+
     unittest.main()

@@ -1,4 +1,5 @@
 from json.encoder import JSONEncoder
+
 import six
 
 from swagger_server.models.base_model_ import Model

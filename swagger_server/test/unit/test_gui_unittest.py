@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch
+
 from swagger_server.controllers.gui_controller import get_metrics
 
 

@@ -27,7 +27,7 @@ def elaborate_issues(full_name, state,
     :rtype: IssuesList
     """
     issues_data = MongoOperations.get_issues(repo=full_name, state=state, date_range=date_range, page=page,
-                                       sort=sort)
+                                             sort=sort)
 
     total = MongoOperations.count_issues(repo=full_name, state=state, date_range=date_range)
 
@@ -37,6 +37,7 @@ def elaborate_issues(full_name, state,
     ]
 
     return IssuesList(items=issues, page=page, total_elements=total)
+
 
 def elaborate_prs(full_name, state,
                   date_range, page, sort=None):
@@ -129,13 +130,13 @@ def elaborate_repositories(name=None, language=None, is_private=None, date_range
     """
 
     repositories_data = MongoOperations.get_repositories(name=name, language=language, is_private=is_private,
-                                                   date_range=date_range, stars=stars, forks=forks, issues=issues,
-                                                   pulls=pulls, workflows=workflows, watchers=watchers, page=page,
-                                                   sort=sort)
+                                                         date_range=date_range, stars=stars, forks=forks, issues=issues,
+                                                         pulls=pulls, workflows=workflows, watchers=watchers, page=page,
+                                                         sort=sort)
 
     total = MongoOperations.count_repositories(name=name, language=language, is_private=is_private,
-                                         date_range=date_range, stars=stars, forks=forks, issues=issues,
-                                         pulls=pulls, workflows=workflows, watchers=watchers)
+                                               date_range=date_range, stars=stars, forks=forks, issues=issues,
+                                               pulls=pulls, workflows=workflows, watchers=watchers)
 
     repositories = [
         mapper.map_response_to_repository(repo)
@@ -270,7 +271,7 @@ def elaborate_metrics_repositories():
         repo_dict = repo.to_dict()
         languages.add(repo.language)
 
-        for key in maxes.keys():
+        for key in maxes:
             maxes[key] = max(maxes[key], repo_dict[key])
 
     return Metrics(

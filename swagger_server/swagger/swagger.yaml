@@ -16,131 +16,131 @@ externalDocs:
   description: Find out more about GitHub mining project
   url: https://github.com/sw-group/ghbe
 servers:
-- url: https://127.0.0.1:8080/ghbe/api/v1
+  - url: https://127.0.0.1:8080/ghbe/api/v1
 tags:
-- name: repository
-  description: Everything about GitHub repository
-- name: gui
-  description: Services for the GitHub UI
+  - name: repository
+    description: Everything about GitHub repository
+  - name: gui
+    description: Services for the GitHub UI
 paths:
   /repositories:
     get:
       tags:
-      - repository
+        - repository
       summary: Retrieve repositories with filtering options
       description: Retrieve repositories with filtering options
       operationId: get_repositories
       parameters:
-      - name: name
-        in: query
-        description: "Filter repositories by name. \nIf providing a full name, prefix\
+        - name: name
+          in: query
+          description: "Filter repositories by name. \nIf providing a full name, prefix\
           \ it with repo: (e.g., repo:owner/name).\n"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^(repo:[\\w-]+/[\\w-]+|[\\w-]+)$"
-          type: string
-      - name: language
-        in: query
-        description: Filter repositories by programming language
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: isPrivate
-        in: query
-        description: Filter private repositories
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
-      - name: dateRange
-        in: query
-        description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
-          type: string
-      - name: stars
-        in: query
-        description: "Filter repositories by stars range (e.g., 10,100)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: forks
-        in: query
-        description: "Filter repositories by forks range (e.g., 5,50)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: issues
-        in: query
-        description: "Filter repositories by issues range (e.g., 0,20)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: pulls
-        in: query
-        description: "Filter repositories by pull requests range (e.g., 1,10)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: workflows
-        in: query
-        description: "Filter repositories by workflows range (e.g., 1,5)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: watchers
-        in: query
-        description: "Filter repositories by watchers range (e.g., 1,20)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: page
-        in: query
-        description: Specify the page number for paginated results (default is 1)
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-          format: int32
-          default: 1
-      - name: sort
-        in: query
-        description: "Sort repositories by field in ascending or descending order\
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^(repo:[\\w-]+/[\\w-]+|[\\w-]+)$"
+            type: string
+        - name: language
+          in: query
+          description: Filter repositories by programming language
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: isPrivate
+          in: query
+          description: Filter private repositories
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: boolean
+        - name: dateRange
+          in: query
+          description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+            type: string
+        - name: stars
+          in: query
+          description: "Filter repositories by stars range (e.g., 10,100)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: forks
+          in: query
+          description: "Filter repositories by forks range (e.g., 5,50)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: issues
+          in: query
+          description: "Filter repositories by issues range (e.g., 0,20)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: pulls
+          in: query
+          description: "Filter repositories by pull requests range (e.g., 1,10)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: workflows
+          in: query
+          description: "Filter repositories by workflows range (e.g., 1,5)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: watchers
+          in: query
+          description: "Filter repositories by watchers range (e.g., 1,20)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: page
+          in: query
+          description: Specify the page number for paginated results (default is 1)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: sort
+          in: query
+          description: "Sort repositories by field in ascending or descending order\
           \ \n(e.g., field-asc or field-desc).\nIf order is not specified, default\
           \ to ascending.\n"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^[\\w.-]+(-asc|-desc)?$"
-          type: string
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^[\\w.-]+(-asc|-desc)?$"
+            type: string
       responses:
         "200":
           description: Successful operation
@@ -158,29 +158,29 @@ paths:
   /repositories/{owner}/{name}:
     get:
       tags:
-      - repository
+        - repository
       summary: Search repositories by filter
       description: Search repositories by filter
       operationId: get_repository_by_full_name
       parameters:
-      - name: owner
-        in: path
-        description: The owner of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: owner
-      - name: name
-        in: path
-        description: The name of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: name
+        - name: owner
+          in: path
+          description: The owner of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: owner
+        - name: name
+          in: path
+          description: The name of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: name
       responses:
         "200":
           description: Successful operation
@@ -198,29 +198,29 @@ paths:
   /repositories/{owner}/{name}/workflows:
     get:
       tags:
-      - repository
+        - repository
       summary: Search workflows of the repo by fullname
       description: Search workflows of the repo by fullname
       operationId: get_workflows_of_repo
       parameters:
-      - name: owner
-        in: path
-        description: The owner of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: owner
-      - name: name
-        in: path
-        description: The name of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: name
+        - name: owner
+          in: path
+          description: The owner of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: owner
+        - name: name
+          in: path
+          description: The name of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: name
       responses:
         "200":
           description: Successful operation
@@ -242,83 +242,83 @@ paths:
   /repositories/{owner}/{name}/issues:
     get:
       tags:
-      - repository
+        - repository
       summary: Search issues of the repo by fullname
       description: Search issues of the repo by fullname
       operationId: get_issues_of_repo
       parameters:
-      - name: owner
-        in: path
-        description: The owner of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: owner
-      - name: name
-        in: path
-        description: The name of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: name
-      - name: issue_type
-        in: query
-        description: The type of the issues
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-          default: issues
-          enum:
-          - issues
-          - pulls
-      - name: state
-        in: query
-        description: The state of the issues
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          enum:
-          - open
-          - closed
-          - merged
-      - name: dateRange
-        in: query
-        description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
-          type: string
-      - name: page
-        in: query
-        description: Specify the page number for paginated results (default is 1)
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-          format: int32
-          default: 1
-      - name: sort
-        in: query
-        description: "Sort repositories by field in ascending or descending order\
+        - name: owner
+          in: path
+          description: The owner of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: owner
+        - name: name
+          in: path
+          description: The name of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: name
+        - name: issue_type
+          in: query
+          description: The type of the issues
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            default: issues
+            enum:
+              - issues
+              - pulls
+        - name: state
+          in: query
+          description: The state of the issues
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - open
+              - closed
+              - merged
+        - name: dateRange
+          in: query
+          description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+            type: string
+        - name: page
+          in: query
+          description: Specify the page number for paginated results (default is 1)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: sort
+          in: query
+          description: "Sort repositories by field in ascending or descending order\
           \ \n(e.g., field-asc or field-desc).\nIf order is not specified, default\
           \ to ascending.\n"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^[\\w.-]+(-asc|-desc)?$"
-          type: string
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^[\\w.-]+(-asc|-desc)?$"
+            type: string
       responses:
         "200":
           description: Successful operation
@@ -337,49 +337,49 @@ paths:
   /repositories/{owner}/{name}/issues/{number}/comments:
     get:
       tags:
-      - repository
+        - repository
       summary: Search issues of the repo by fullname
       description: Search issues of the repo by fullname
       operationId: get_comments_of_issue
       parameters:
-      - name: owner
-        in: path
-        description: The owner of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: owner
-      - name: name
-        in: path
-        description: The name of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: name
-      - name: number
-        in: path
-        description: The number of the issue
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: integer
-          format: int32
-          default: 1
-      - name: page
-        in: query
-        description: Specify the page number for paginated results (default is 1)
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-          format: int32
-          default: 1
+        - name: owner
+          in: path
+          description: The owner of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: owner
+        - name: name
+          in: path
+          description: The name of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: name
+        - name: number
+          in: path
+          description: The number of the issue
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: page
+          in: query
+          description: Specify the page number for paginated results (default is 1)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            default: 1
       responses:
         "200":
           description: Successful operation
@@ -398,110 +398,110 @@ paths:
   /repositories/statistics:
     get:
       tags:
-      - repository
+        - repository
       summary: Compute the statistics of all the filtered repositories
       description: "Compute the statistics of all the filtered repositories. \nIf\
         \ you want not insert any filter the statistic will realize on every field.\n"
       operationId: get_statistics
       parameters:
-      - name: name
-        in: query
-        description: |
-          Filter repositories by name. If providing a full name, prefix it with repo: (e.g., repo:owner/name).
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^(repo:[\\w-]+/[\\w-]+|[\\w-]+)$"
-          type: string
-      - name: language
-        in: query
-        description: Filter repositories by programming language
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: isPrivate
-        in: query
-        description: Filter private repositories
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
-      - name: dateRange
-        in: query
-        description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
-          type: string
-      - name: stars
-        in: query
-        description: "Filter repositories by stars range (e.g., 10,100)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: forks
-        in: query
-        description: "Filter repositories by forks range (e.g., 5,50)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: issues
-        in: query
-        description: "Filter repositories by issues range (e.g., 0,20)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: pulls
-        in: query
-        description: "Filter repositories by pull requests range (e.g., 1,10)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: workflows
-        in: query
-        description: "Filter repositories by workflows range (e.g., 1,5)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: watchers
-        in: query
-        description: "Filter repositories by watchers range (e.g., 1,20)"
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d+,\\d+$"
-          type: string
-      - name: dateRangeStats
-        in: query
-        description: "Filter stats by date range (e.g., 2023-01-01,2023-12-31), relative to updated date of issues/pr"
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
-          type: string
+        - name: name
+          in: query
+          description: |
+            Filter repositories by name. If providing a full name, prefix it with repo: (e.g., repo:owner/name).
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^(repo:[\\w-]+/[\\w-]+|[\\w-]+)$"
+            type: string
+        - name: language
+          in: query
+          description: Filter repositories by programming language
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: isPrivate
+          in: query
+          description: Filter private repositories
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: boolean
+        - name: dateRange
+          in: query
+          description: "Filter repositories by date range (e.g., 2023-01-01,2023-12-31)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+            type: string
+        - name: stars
+          in: query
+          description: "Filter repositories by stars range (e.g., 10,100)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: forks
+          in: query
+          description: "Filter repositories by forks range (e.g., 5,50)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: issues
+          in: query
+          description: "Filter repositories by issues range (e.g., 0,20)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: pulls
+          in: query
+          description: "Filter repositories by pull requests range (e.g., 1,10)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: workflows
+          in: query
+          description: "Filter repositories by workflows range (e.g., 1,5)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: watchers
+          in: query
+          description: "Filter repositories by watchers range (e.g., 1,20)"
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d+,\\d+$"
+            type: string
+        - name: dateRangeStats
+          in: query
+          description: "Filter stats by date range (e.g., 2023-01-01,2023-12-31), relative to updated date of issues/pr"
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+            type: string
       responses:
         "200":
           description: Successful operation
@@ -520,38 +520,38 @@ paths:
   /repositories/{owner}/{name}/statistics:
     get:
       tags:
-      - repository
+        - repository
       summary: Compute the statistics of a repository
       description: Compute the statistics of a repository
       operationId: get_statistics_of_repository
       parameters:
-      - name: owner
-        in: path
-        description: The owner of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: owner
-      - name: name
-        in: path
-        description: The name of the repository
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          default: name
-      - name: dateRange
-        in: query
-        description: "Filter stats by date range (e.g., 2023-01-01,2023-12-31), relative to updated date of issues/pr"
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
-          type: string
+        - name: owner
+          in: path
+          description: The owner of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: owner
+        - name: name
+          in: path
+          description: The name of the repository
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            default: name
+        - name: dateRange
+          in: query
+          description: "Filter stats by date range (e.g., 2023-01-01,2023-12-31), relative to updated date of issues/pr"
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-\\d{2}-\\d{2},\\d{4}-\\d{2}-\\d{2}$"
+            type: string
       responses:
         "200":
           description: Successful operation
@@ -570,7 +570,7 @@ paths:
   /metrics:
     get:
       tags:
-      - gui
+        - gui
       summary: Get the metrics for filter configuration
       description: Get the metrics for filter configuration
       operationId: get_metrics
@@ -711,8 +711,8 @@ components:
         state:
           type: string
           enum:
-          - OPEN
-          - CLOSED
+            - OPEN
+            - CLOSED
         body:
           type: string
         author:
@@ -747,8 +747,8 @@ components:
         body: body
         url: url
         labels:
-        - name: name
-        - name: name
+          - name: name
+          - name: name
     Comment:
       type: object
       properties:
@@ -800,9 +800,9 @@ components:
         repositories:
           $ref: '#/components/schemas/Statistics_repositories'
       example:
-        repositories: {}
-        workflows: {}
-        issues: {}
+        repositories: { }
+        workflows: { }
+        issues: { }
         pulls:
           merged: 6
           dailyClosedProgress:
@@ -832,27 +832,27 @@ components:
           key: 0
     Statistics_pulls:
       allOf:
-      - $ref: '#/components/schemas/Statistics_base'
-      - type: object
-        properties:
-          merged:
-            type: integer
-            format: int32
-        example:
-          merged: 6
-          dailyClosedProgress:
-            key: 0
-          dailyOpenedProgress:
-            key: 0
+        - $ref: '#/components/schemas/Statistics_base'
+        - type: object
+          properties:
+            merged:
+              type: integer
+              format: int32
+          example:
+            merged: 6
+            dailyClosedProgress:
+              key: 0
+            dailyOpenedProgress:
+              key: 0
     Statistics_issues:
       allOf:
-      - $ref: '#/components/schemas/Statistics_base'
-      - type: object
-        example:
-          dailyClosedProgress:
-            key: 0
-          dailyOpenedProgress:
-            key: 0
+        - $ref: '#/components/schemas/Statistics_base'
+        - type: object
+          example:
+            dailyClosedProgress:
+              key: 0
+            dailyOpenedProgress:
+              key: 0
     Statistics_workflows:
       type: object
       properties:
@@ -895,8 +895,8 @@ components:
             key: 0
       example:
         languages:
-        - languages
-        - languages
+          - languages
+          - languages
         maxs:
           key: 0
     Result:
@@ -911,32 +911,32 @@ components:
     RepositoriesList:
       title: RepositoriesList
       allOf:
-      - $ref: '#/components/schemas/Result'
-      - type: object
-        properties:
-          items:
-            type: array
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
             items:
-              $ref: '#/components/schemas/Repository'
+              type: array
+              items:
+                $ref: '#/components/schemas/Repository'
       x-content-type: application/json
     IssuesList:
       title: IssuesList
       allOf:
-      - $ref: '#/components/schemas/Result'
-      - type: object
-        properties:
-          items:
-            type: array
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
             items:
-              $ref: '#/components/schemas/Issue'
+              type: array
+              items:
+                $ref: '#/components/schemas/Issue'
     CommentsList:
       title: CommentsList
       allOf:
-      - $ref: '#/components/schemas/Result'
-      - type: object
-        properties:
-          items:
-            type: array
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
             items:
-              $ref: '#/components/schemas/Comment'
+              type: array
+              items:
+                $ref: '#/components/schemas/Comment'
 

@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
+
 from swagger_server.controllers import repository_controller as rc
+
 
 class TestRepositoryControllerWhiteBox(unittest.TestCase):
 
