@@ -6,14 +6,6 @@ class TestGuiControllerIntegration(BaseTestCase):
         super().setUp()
         self.client = self.app.test_client()
         # Inizializza dati di test nel DB mock
-
-    def tearDown(self):
-        super().tearDown()
-        self.mongo.db.repositories.delete_many({})
-
-    def test_get_repositories(self):
-        # Chiamata all’endpoint esposto dal tuo controller
-        response = self.client.get("/repositories?page=1")
         self.mongo.db.repositories.insert_one({
             "_id": "user/repo1",
             "data": {
@@ -24,6 +16,15 @@ class TestGuiControllerIntegration(BaseTestCase):
                 "stars_count": 10,
             }
         })
+
+    def tearDown(self):
+        super().tearDown()
+        self.mongo.db.repositories.delete_many({})
+
+    def test_get_repositories(self):
+        # Chiamata all’endpoint esposto dal tuo controller
+        response = self.client.get("/repositories?page=1")
+
         data = self.assert_json_response(response, 200)
 
         self.assertEqual(data["total_elements"], 1)
