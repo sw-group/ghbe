@@ -6,11 +6,11 @@ from mongomock import MongoClient
 from swagger_server import create_app
 
 
-class PyMongoMock(MongoClient):
+class PyMongoMock:
     """Mock compatibile con PyMongo che usa mongomock sotto"""
 
     def __init__(self):
-        super().__init__()
+        self.client = MongoClient()
         # usa un db fittizio "testdb"
         self.db = self.client["test"]
 

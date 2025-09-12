@@ -18,7 +18,7 @@ from swagger_server.models import (
     Repository, Metrics, Statistics
 )
 
-
+# TODO: Rewrite ALL!
 # -------------------
 # White Box Unit Tests
 # -------------------
@@ -32,7 +32,7 @@ class TestBusinessLayerWhiteBox(unittest.TestCase):
         mock_mongo.count_issues.return_value = 1
         mock_mapper.return_value = {"mapped": "issue"}
 
-        result = elaborate_issues("repo/test", "issues", "OPEN", "2023-01-01,2023-12-31", 1)
+        result = elaborate_issues("repo/test", "OPEN", "2023-01-01,2023-12-31", 1)
         self.assertIsInstance(result, IssuesList)
         self.assertEqual(result.items, [{"mapped": "issue"}])
         mock_mongo.close.assert_called_once()

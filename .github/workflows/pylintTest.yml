@@ -3,10 +3,10 @@ name: Pylint Tests
 on:
   push:
     paths:
-      - "swagger_server/test/**.py"
+      - "test/**.py"
   pull_request:
     paths:
-      - "swagger_server/test/**.py"
+      - "test/**.py"
   workflow_dispatch:
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
 
       - name: Analysing the code with pylint
         run: |
-          FILES=$(git ls-files 'swagger_server/test/*.py')
+          FILES=$(git ls-files 'test/*.py')
           if [ -f .pylintrc ]; then
             echo "pylint --rcfile=.pylintrc $FILES --output-format=text:lint.txt,colorized"
             pylint --rcfile=.pylintrc $FILES --output-format=text:lint.txt,colorized || pylint-exit $?

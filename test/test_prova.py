@@ -1,7 +1,7 @@
-from swagger_server.test import BaseTestCase
+from test import BaseTestCase
 
 
-class TestGuiControllerIntegration(BaseTestCase):
+class TestProva(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.client = self.app.test_client()
@@ -12,7 +12,7 @@ class TestGuiControllerIntegration(BaseTestCase):
                 "full_name": "user/repo1",
                 "language": "Python",
                 "private": False,
-                "updated_at": "2025-01-01T00:00:00",
+                "updated_at": "2025-01-01T00:00:00Z",
                 "stars_count": 10,
             }
         })
@@ -33,3 +33,9 @@ class TestGuiControllerIntegration(BaseTestCase):
         # Chiamata all’endpoint esposto dal tuo controller
         response = self.client.get("/repositories/user/repo1")
         data = self.assert_json_response(response, 200)
+
+        # Verifica che i dati del repository siano corretti
+        self.assertEqual(data["full_name"], "user/repo1")
+        self.assertEqual(data["language"], "Python")
+        self.assertEqual(data["private"], False)
+        self.assertEqual(data["stars_count"], 10)
