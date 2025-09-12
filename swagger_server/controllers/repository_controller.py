@@ -46,7 +46,8 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
     :type date_range: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
-    :param sort: Sort repositories by field in ascending or descending order  (e.g., field-asc or field-desc). If order is not specified, default to ascending.
+    :param sort: Sort repositories by field in ascending or descending order
+                (e.g., field-asc or field-desc). If order is not specified, default to ascending.
     :type sort: str
 
     :rtype: IssuesList
@@ -86,7 +87,8 @@ def get_repositories(name=None, language=None, is_private=None, date_range=None,
     :type watchers: str
     :param page: Specify the page number for paginated results (default is 1)
     :type page: int
-    :param sort: Sort repositories by field in ascending or descending order  (e.g., field-asc or field-desc). If order is not specified, default to ascending.
+    :param sort: Sort repositories by field in ascending or descending order
+                (e.g., field-asc or field-desc). If order is not specified, default to ascending.
     :type sort: str
 
     :rtype: RepositoriesList
