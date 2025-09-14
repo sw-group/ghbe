@@ -1,11 +1,10 @@
-from flask import jsonify, request
-
 from swagger_server.business import business
 from swagger_server.models.comments_list import CommentsList  # noqa: E501
 from swagger_server.models.issues_list import IssuesList  # noqa: E501
 from swagger_server.models.repositories_list import RepositoriesList  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
+from swagger_server.utils.validation import parse_bool_param, parse_sort_param, parse_positive_int
 
 
 def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
@@ -187,16 +186,17 @@ def get_statistics_of_repository(owner, name, date_range):  # noqa: E501
     return business.elaborate_statistic(repo_full_name, date_range).to_dict()
 
 
+from flask import request, jsonify, abort
+import re
+
 def register_repository_routes(app):
     # /repositories
     @app.route("/repositories", methods=["GET"])
     def repositories_route():
-        is_private_str = request.args.get("isPrivate")
-        is_private = is_private_str.lower() == "true" if is_private_str else None
         return jsonify(get_repositories(
             name=request.args.get("name"),
             language=request.args.get("language"),
-            is_private=is_private,
+            is_private=parse_bool_param("isPrivate"),
             date_range=request.args.get("dateRange"),
             stars=request.args.get("stars"),
             forks=request.args.get("forks"),
@@ -204,27 +204,25 @@ def register_repository_routes(app):
             pulls=request.args.get("pulls"),
             workflows=request.args.get("workflows"),
             watchers=request.args.get("watchers"),
-            page=int(request.args.get("page", 1)) if request.args.get("page") else 1,
-            sort=request.args.get("sort")
+            page=parse_positive_int("page", default=1, min_value=1),
+            sort=parse_sort_param("sort"),
         ))
 
     # /repositories/statistics
     @app.route("/repositories/statistics", methods=["GET"])
     def repositories_statistics_route():
-        is_private_str = request.args.get("isPrivate")
-        is_private = is_private_str.lower() == "true" if is_private_str else None
         return jsonify(get_statistics(
             date_range_stats=request.args.get("dateRangeStats"),
             name=request.args.get("name"),
             language=request.args.get("language"),
-            is_private=is_private,
+            is_private=parse_bool_param("isPrivate"),
             date_range=request.args.get("dateRange"),
             stars=request.args.get("stars"),
             forks=request.args.get("forks"),
             issues=request.args.get("issues"),
             pulls=request.args.get("pulls"),
             workflows=request.args.get("workflows"),
-            watchers=request.args.get("watchers")
+            watchers=request.args.get("watchers"),
         ))
 
     # /repositories/{owner}/{name}
@@ -246,8 +244,8 @@ def register_repository_routes(app):
             issue_type=request.args.get("issue_type"),
             state=request.args.get("state"),
             date_range=request.args.get("dateRange"),
-            page=int(request.args.get("page", 1)) if request.args.get("page") else 1,
-            sort=request.args.get("sort")
+            page=parse_positive_int("page", default=1, min_value=1),
+            sort=parse_sort_param("sort"),
         ))
 
     # /repositories/{owner}/{name}/issues/{number}/comments
@@ -257,7 +255,7 @@ def register_repository_routes(app):
             owner,
             name,
             number,
-            page=int(request.args.get("page", 1)) if request.args.get("page") else 1,
+            page=parse_positive_int("page", default=1, min_value=1),
         ))
 
     # /repositories/{owner}/{name}/statistics
@@ -266,5 +264,5 @@ def register_repository_routes(app):
         return jsonify(get_statistics_of_repository(
             owner,
             name,
-            date_range=request.args.get("dateRange")
+            date_range=request.args.get("dateRange"),
         ))

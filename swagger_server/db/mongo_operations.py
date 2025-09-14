@@ -63,7 +63,7 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        if page == -1:
+        if page <= -1:
             cursor = swagger_server.db.database.mongo.db.repositories.find(query).sort('data.' + field, sort_order)
         else:
             cursor = (swagger_server.db.database.mongo.db.repositories.find(query).sort('data.' + field, sort_order)
@@ -103,7 +103,7 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        if page == -1:
+        if page <= -1:
             cursor = swagger_server.db.database.mongo.db.issues.find(query).sort(field, sort_order)
         else:
             cursor = (swagger_server.db.database.mongo.db.issues.find(query).sort(field, sort_order)
@@ -139,7 +139,7 @@ class MongoOperations:
         per_page = 20  # Define your pagination size
         skip = (page - 1) * per_page
 
-        if page == -1:
+        if page <= -1:
             cursor = swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order)
         else:
             cursor = (swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order)

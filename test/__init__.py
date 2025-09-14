@@ -11,11 +11,11 @@ class PyMongoMock:
 
     def __init__(self):
         self.client = MongoClient()
-        # usa un db fittizio "testdb"
+        # usa un db fittizio "test"
         self.db = self.client["test"]
 
-    def init_app(self, app):
-        # Non fa nulla nei test, serve solo per compatibilità
+    def init_app(self, app): # pylint: disable=unused-argument
+        """ Function overrided for compatibility. """
         return self
 
 
@@ -25,9 +25,9 @@ class BaseTestCase(TestCase):
         # Patch del global `mongo` usato da tutto il codice
         patcher = patch("swagger_server.db.database.mongo", new_callable=PyMongoMock)
         self.addCleanup(patcher.stop)
-        self.mongo = patcher.start()
+        self.mongo = patcher.start() # pylint: disable=attribute-defined-outside-init
 
-        """Required by Flask-Testing: return a Flask app instance"""
+        # Required by Flask-Testing: return a Flask app instance
         app = create_app().app
         app.config['TESTING'] = True
         app.config['PROPAGATE_EXCEPTIONS'] = True
