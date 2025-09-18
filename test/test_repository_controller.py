@@ -1,63 +1,68 @@
 from swagger_server.models import RepositoriesList, Repository
 from test import BaseTestCase
-from test.fixtures import TEST_REPOSITORIES
+import swagger_server.db.database
 
 
 class TestRepositoryController(BaseTestCase):
     """Tests for the GUI controller."""
 
     def setUp(self):
+        from test.fixtures import TEST_REPOSITORIES
         """Set up test variables."""
         super().setUp()
         self.client = self.app.test_client()
         # Setup test data if needed
-        self.mongo.db.repositories.insert_many(TEST_REPOSITORIES)
+        swagger_server.db.database.mongo.db.repositories.insert_many(TEST_REPOSITORIES)
 
     def tearDown(self):
         """Tear down test variables."""
         super().tearDown()
-        self.mongo.db.repositories.delete_many({})
+        swagger_server.db.database.mongo.db.repositories.delete_many({})
 
     """Test the /repositories endpoint."""
     def test_get_repositories(self):
         """Test the /repositories endpoint without parameters."""
         response = self.client.get('/repositories')
-        data = self.assert_json_response(response, 200)
-        model = RepositoriesList.from_dict(data)  # convert dict to model
 
+        data = self.assert_json_response(response, 200)
+
+        model = RepositoriesList.from_dict(data)  # convert dict to model
         self.assertIsInstance(model, RepositoriesList)
-        self.assertEqual(len(model.items), len(TEST_REPOSITORIES))
+        self.assertEqual(model.total_elements, 20)
 
     def test_get_repositories_with_pagination(self):
         """Test the /repositories endpoint with pagination parameters."""
-        response = self.client.get('/repositories?page=1&size=2')
-        data = self.assert_json_response(response, 200)
-        model = RepositoriesList.from_dict(data)
+        response = self.client.get('/repositories?page=2')
 
+        data = self.assert_json_response(response, 200)
+
+        model = RepositoriesList.from_dict(data)
         self.assertIsInstance(model, RepositoriesList)
-        self.assertEqual(len(model.items), 2)
+        self.assertEquals(model.items, [])
+        self.assertEqual(model.total_elements, 20)
 
     def test_get_repositories_with_language_filter(self):
         """Test the /repositories endpoint with language filter."""
-        language = 'Python'
-        response = self.client.get(f'/repositories?language={language}')
-        data = self.assert_json_response(response, 200)
-        model = RepositoriesList.from_dict(data)
+        response = self.client.get(f'/repositories?language=Python')
 
+        data = self.assert_json_response(response, 200)
+
+        model = RepositoriesList.from_dict(data)
         self.assertIsInstance(model, RepositoriesList)
         for repo in model.items:
-            self.assertEqual(repo.language, language)
+            self.assertEqual(repo.language, 'Python')
+        self.assertEqual(model.total_elements, 2)
 
     def test_get_repositories_with_no_matching_language(self):
         """Test the /repositories endpoint with a language that has no matches."""
         language = 'NonExistentLanguage'
         response = self.client.get(f'/repositories?language={language}')
-        data = self.assert_json_response(response, 200)
-        model = RepositoriesList.from_dict(data)
 
+        data = self.assert_json_response(response, 200)
+
+        model = RepositoriesList.from_dict(data)
         self.assertIsInstance(model, RepositoriesList)
-        self.assertEqual(len(model.items), 0)
-        self.assertEqual(model.total_elements, None)
+        self.assertEqual(model.total_elements, 0)
 
     def test_get_repositories_invalid_page(self):
         """Test the /repositories endpoint with a pagination less -1."""
@@ -76,6 +81,7 @@ class TestRepositoryController(BaseTestCase):
 
     """Test the /repositories/{owner}/{name} endpoint."""
     def test_get_repository(self):
+        from test.fixtures import TEST_REPOSITORIES
         repo_id = TEST_REPOSITORIES[0]['_id']
 
         response = self.client.get(f'/repositories/{repo_id}')

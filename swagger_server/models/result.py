@@ -30,7 +30,7 @@ class Result(Model):
 
         self.attribute_map = {
             'page': 'page',
-            'total_elements': 'totalElements'
+            'total_elements': 'total_elements'
         }
         self._page = page
         self._total_elements = total_elements

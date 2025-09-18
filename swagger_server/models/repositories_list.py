@@ -36,7 +36,7 @@ class RepositoriesList(Model):
         self.attribute_map = {
             'items': 'items',
             'page': 'page',
-            'total_elements': 'totalElements'
+            'total_elements': 'total_elements'
         }
         self._items = items
         self._page = page
