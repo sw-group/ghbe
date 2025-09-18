@@ -5,7 +5,8 @@ from mongomock import MongoClient
 
 from swagger_server import create_app
 
-
+''' Arrange: Set up the test environment.
+    Setup a mock MongoDB instance using mongomock for testing purposes. '''
 class PyMongoMock:
     """Mock compatibile con PyMongo che usa mongomock sotto"""
 
