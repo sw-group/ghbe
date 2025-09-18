@@ -140,9 +140,9 @@ class MongoOperations:
         skip = (page - 1) * per_page
 
         if page <= -1:
-            cursor = swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order)
+            cursor = swagger_server.db.database.mongo.db.pullRequests.find(query).sort(field, sort_order)
         else:
-            cursor = (swagger_server.db.database.mongo.db.prs.find(query).sort(field, sort_order)
+            cursor = (swagger_server.db.database.mongo.db.pullRequests.find(query).sort(field, sort_order)
                       .skip(skip).limit(per_page))
 
         prs = list(cursor)
@@ -254,7 +254,7 @@ class MongoOperations:
                 '$lt': e_date.isoformat()  # End of the filter_date
             }
 
-        total = swagger_server.db.database.mongo.db.prs.count_documents(query)
+        total = swagger_server.db.database.mongo.db.pullRequests.count_documents(query)
 
         return total
 

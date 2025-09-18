@@ -52,9 +52,9 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
     :rtype: IssuesList
     """
     repo_full_name = f'{owner}/{name}'
-    values: IssuesList = business.elaborate_issues(repo_full_name, state, date_range, page,
-                                                   sort) if issue_type == "issues" \
-        else business.elaborate_prs(repo_full_name, state, date_range, page, sort)
+    values: IssuesList = (
+        business.elaborate_issues(repo_full_name, state, date_range, page,sort) if issue_type == 'issues'
+        else business.elaborate_prs(repo_full_name, state, date_range, page, sort))
     return values.to_dict()
 
 

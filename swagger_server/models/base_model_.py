@@ -1,3 +1,4 @@
+import datetime
 import pprint
 import typing
 
@@ -44,6 +45,8 @@ class Model(object):
                     if hasattr(item[1], "to_dict") else item,
                     value.items()
                 ))
+            elif isinstance(value, datetime.datetime):
+                result[attr] = value.isoformat()  # <-- serialize datetime
             else:
                 result[attr] = value
 
