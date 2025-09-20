@@ -55,3 +55,11 @@ def parse_sort_param(name: str = "sort"):
     if not re.match(r"^[a-zA-Z0-9_]+-(asc|desc)$", value):
         abort(400, description=f"Invalid value for '{name}': must be in format 'field-asc' or 'field-desc'")
     return value
+
+def parse_issues_type(name: str = "issue_type"):
+    value = request.args.get(name)
+    if value is None:
+        abort(400, description=f"issue_type parameter is required")
+    if not re.match(r"^issues|pulls", value):
+        abort(400, description=f"Invalid value for '{name}': must be 'issues' or 'pulls'")
+    return value

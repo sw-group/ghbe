@@ -26,7 +26,7 @@ class BaseTestCase(TestCase):
         # Patch del global `mongo` usato da tutto il codice
         patcher = patch("swagger_server.db.database.mongo", new_callable=PyMongoMock)
         self.addCleanup(patcher.stop)
-        self.mongo = patcher.start() # pylint: disable=attribute-defined-outside-init
+        patcher.start()  # pylint: disable=attribute-defined-outside-init
 
         # Required by Flask-Testing: return a Flask app instance
         app = create_app().app

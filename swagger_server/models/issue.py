@@ -202,7 +202,7 @@ class Issue(Model):
         :param state: The state of this Issue.
         :type state: str
         """
-        allowed_values = ["OPEN", "CLOSED"]  # noqa: E501
+        allowed_values = ["OPEN", "CLOSED", "MERGED"]  # noqa: E501
         if state not in allowed_values:
             raise ValueError(
                 f"Invalid value for `state` ({state}), must be one of {allowed_values}"

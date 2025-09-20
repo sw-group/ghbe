@@ -4,7 +4,7 @@ from swagger_server.models.issues_list import IssuesList  # noqa: E501
 from swagger_server.models.repositories_list import RepositoriesList  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
-from swagger_server.utils.validation import parse_bool_param, parse_sort_param, parse_positive_int
+from swagger_server.utils.validation import parse_bool_param, parse_sort_param, parse_positive_int, parse_issues_type
 
 
 def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
@@ -53,7 +53,7 @@ def get_issues_of_repo(owner, name, issue_type, state=None, date_range=None, pag
     """
     repo_full_name = f'{owner}/{name}'
     values: IssuesList = (
-        business.elaborate_issues(repo_full_name, state, date_range, page,sort) if issue_type == 'issues'
+        business.elaborate_issues(repo_full_name, state, date_range, page, sort) if issue_type == 'issues'
         else business.elaborate_prs(repo_full_name, state, date_range, page, sort))
     return values.to_dict()
 
@@ -241,7 +241,7 @@ def register_repository_routes(app):
         return jsonify(get_issues_of_repo(
             owner,
             name,
-            issue_type=request.args.get("issue_type"),
+            issue_type=parse_issues_type("issue_type"),
             state=request.args.get("state"),
             date_range=request.args.get("dateRange"),
             page=parse_positive_int("page", default=1, min_value=1),

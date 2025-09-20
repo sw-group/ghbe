@@ -1,6 +1,7 @@
-from swagger_server.models import RepositoriesList, Repository
+from swagger_server.models import RepositoriesList, Repository, IssuesList
 from test import BaseTestCase
 import swagger_server.db.database
+from test.fixtures import TEST_ISSUES, TEST_PULLS
 
 
 class TestRepositoryController(BaseTestCase):
@@ -13,6 +14,8 @@ class TestRepositoryController(BaseTestCase):
         self.client = self.app.test_client()
         # Setup test data if needed
         swagger_server.db.database.mongo.db.repositories.insert_many(TEST_REPOSITORIES)
+        swagger_server.db.database.mongo.db.issues.insert_many(TEST_ISSUES)
+        swagger_server.db.database.mongo.db.pullRequests.insert_many(TEST_PULLS)
 
     def tearDown(self):
         """Tear down test variables."""
@@ -69,28 +72,109 @@ class TestRepositoryController(BaseTestCase):
         response = self.client.get('/repositories?page=-2')
         self.assert_json_response(response, 400)
 
-    """ Edge test for /repositories endpoint with invalid parameters."""
     def test_get_repositories_invalid_parameters(self):
-        response = self.client.get('/repositories?page=abc&size=-5')
+        """ Edge test for /repositories endpoint with invalid parameters."""
+        response = self.client.get('/repositories?page=abc')
         self.assert_json_response(response, 400)
 
-    """ Other edge tests can be added similarly """
     def test_get_repositories_invalid_sort(self):
+        """ Edge test for /repositories endpoint with invalid sort format."""
         response = self.client.get('/repositories?sort=invalid-sort-format')
         self.assert_json_response(response, 400)
 
     """Test the /repositories/{owner}/{name} endpoint."""
     def test_get_repository(self):
-        from test.fixtures import TEST_REPOSITORIES
-        repo_id = TEST_REPOSITORIES[0]['_id']
+        """Test the /repositories/{owner}/{name} endpoint with a valid repository."""
+        repo_id = 'user/repo1'
 
         response = self.client.get(f'/repositories/{repo_id}')
-        data = self.assert_json_response(response, 200)
-        model = Repository.from_dict(data)
 
-        self.assertEqual(response.status_code, 200)
+        data = self.assert_json_response(response, 200)
+
+        model = Repository.from_dict(data)
         self.assertEqual(model.full_name, repo_id)
 
     def test_get_repository_not_found(self):
+        """ Test the /repositories/{owner}/{name} endpoint with a non-existent repository."""
         response = self.client.get('/repositories/nonexistent_owner/nonexistent_repo')
         self.assert_json_response(response, 404)
+
+    """Test the /repositories/{owner}/{name}/issues endpoint."""
+    def test_get_repository_issues(self):
+        """Test the /repositories/{owner}/{name}/issues endpoint with a valid repository."""
+        repo_id = 'user/repo1'
+
+        response = self.client.get(f'/repositories/{repo_id}/issues?issue_type=issues')
+
+        data = self.assert_json_response(response, 200)
+
+        model = IssuesList.from_dict(data)
+        self.assertIsInstance(model, IssuesList)
+        self.assertEquals(model.total_elements, 2)
+
+    def test_get_repository_issue_with_sort(self):
+        """Test the /repositories/{owner}/{name}/issues endpoint with a valid repository and sort parameter."""
+        repo_id = 'user/repo1'
+
+        response = self.client.get(f'/repositories/{repo_id}/issues?issue_type=issues&sort=createdAt-desc')
+
+        data = self.assert_json_response(response, 200)
+
+        model = IssuesList.from_dict(data)
+        self.assertIsInstance(model, IssuesList)
+        self.assertEquals(model.total_elements, 2)
+        self.assertLessEqual(model.items[1].created_at, model.items[0].created_at)
+
+    def test_get_repository_no_exist_issues(self):
+        """ Test the /repositories/{owner}/{name}/issues endpoint with a non-existent repository."""
+        response = self.client.get('/repositories/nonexistent_owner/nonexistent_repo/issues?issue_type=issues')
+        data = self.assert_json_response(response, 200)
+
+        model = IssuesList.from_dict(data)
+        self.assertIsInstance(model, IssuesList)
+        self.assertEquals(model.total_elements, 0)
+
+    def test_get_repository_pulls(self):
+        """Test the /repositories/{owner}/{name}/issues endpoint with a valid repository."""
+        repo_id = 'user/repo1'
+
+        response = self.client.get(f'/repositories/{repo_id}/issues?issue_type=pulls')
+
+        data = self.assert_json_response(response, 200)
+
+        model = IssuesList.from_dict(data)
+        self.assertIsInstance(model, IssuesList)
+        self.assertEquals(model.total_elements, 2)
+
+    def test_get_repository_no_exist_pulls(self):
+        """ Test the /repositories/{owner}/{name}/pulls endpoint with a non-existent repository."""
+        response = self.client.get('/repositories/nonexistent_owner/nonexistent_repo/issues?issue_type=pulls')
+        data = self.assert_json_response(response, 200)
+
+        model = IssuesList.from_dict(data)
+        self.assertIsInstance(model, IssuesList)
+        self.assertEquals(model.total_elements, 0)
+
+    def test_get_repository_issues_invalid_issue_type(self):
+        """ Edge test for /repositories/{owner}/{name}/issues endpoint with invalid issue_type."""
+        repo_id = 'user/repo1'
+        response = self.client.get(f'/repositories/{repo_id}/issues?issue_type=invalid_type')
+        self.assert_json_response(response, 400)
+
+    def test_get_repository_issues_invalid_page(self):
+        """ Edge test for /repositories/{owner}/{name}/issues endpoint with invalid page."""
+        repo_id = 'user/repo1'
+        response = self.client.get(f'/repositories/{repo_id}/issues?page=-1&issue_type=issues')
+        self.assert_json_response(response, 400)
+
+    def test_get_repository_issues_without_issue_type(self):
+        """ Edge test for /repositories/{owner}/{name}/issues endpoint without issue_type."""
+        repo_id = 'user/repo1'
+        response = self.client.get(f'/repositories/{repo_id}/issues')
+        self.assert_json_response(response, 400)
+
+    def test_get_repository_issues_invalid_sort(self):
+        """ Edge test for /repositories/{owner}/{name}/issues endpoint with invalid sort format."""
+        repo_id = 'user/repo1'
+        response = self.client.get(f'/repositories/{repo_id}/issues?issue_type=issues&sort=invalid-sort-format')
+        self.assert_json_response(response, 400)
