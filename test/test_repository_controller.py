@@ -1,7 +1,7 @@
-from swagger_server.models import RepositoriesList, Repository, IssuesList
+from swagger_server.models import RepositoriesList, Repository, IssuesList, Workflow, CommentsList
 from test import BaseTestCase
 import swagger_server.db.database
-from test.fixtures import TEST_ISSUES, TEST_PULLS
+from test.fixtures import TEST_ISSUES, TEST_PULLS, TEST_WORKFLOWS, TEST_COMMENTS
 
 
 class TestRepositoryController(BaseTestCase):
@@ -16,11 +16,17 @@ class TestRepositoryController(BaseTestCase):
         swagger_server.db.database.mongo.db.repositories.insert_many(TEST_REPOSITORIES)
         swagger_server.db.database.mongo.db.issues.insert_many(TEST_ISSUES)
         swagger_server.db.database.mongo.db.pullRequests.insert_many(TEST_PULLS)
+        swagger_server.db.database.mongo.db.workflows.insert_many(TEST_WORKFLOWS)
+        swagger_server.db.database.mongo.db.comments.insert_many(TEST_COMMENTS)
 
     def tearDown(self):
         """Tear down test variables."""
         super().tearDown()
         swagger_server.db.database.mongo.db.repositories.delete_many({})
+        swagger_server.db.database.mongo.db.issues.delete_many({})
+        swagger_server.db.database.mongo.db.pullRequests.delete_many({})
+        swagger_server.db.database.mongo.db.workflows.delete_many({})
+        swagger_server.db.database.mongo.db.comments.delete_many({})
 
     """Test the /repositories endpoint."""
     def test_get_repositories(self):
@@ -178,3 +184,68 @@ class TestRepositoryController(BaseTestCase):
         repo_id = 'user/repo1'
         response = self.client.get(f'/repositories/{repo_id}/issues?issue_type=issues&sort=invalid-sort-format')
         self.assert_json_response(response, 400)
+
+    """Test the /repositories/{owner}/{name}/issues/{number}/comments endpoint."""
+    def test_get_repository_issue_comments(self):
+        """Test the /repositories/{owner}/{name}/issues/{number}/comments endpoint with a valid issue."""
+        repo_id = 'user/repo1'
+        issue_number = 1001
+
+        response = self.client.get(f'/repositories/{repo_id}/issues/{issue_number}/comments')
+
+        data = self.assert_json_response(response, 200)
+
+        model = CommentsList.from_dict(data)
+        self.assertIsInstance(model, CommentsList)
+        self.assertEqual(model.total_elements, 2)
+        for comment in model.items:
+            self.assertTrue(hasattr(comment, 'author'))
+            self.assertTrue(hasattr(comment, 'message'))
+            self.assertTrue(hasattr(comment, 'created_at'))
+            self.assertTrue(hasattr(comment, 'updated_at'))
+            self.assertTrue(hasattr(comment, 'association'))
+
+    def test_get_repository_issue_no_exist_comments(self):
+        """ Test the /repositories/{owner}/{name}/issues/{number}/comments endpoint with a non-existent issue."""
+        repo_id = 'user/repo1'
+        issue_number = 9999
+
+        response = self.client.get(f'/repositories/{repo_id}/issues/{issue_number}/comments')
+
+        data = self.assert_json_response(response, 200)
+
+        model = CommentsList.from_dict(data)
+        self.assertIsInstance(model, CommentsList)
+        self.assertEquals(model.total_elements, 0)
+
+
+    """Test the /repositories/{owner}/{name}/workflow endpoint."""
+    def test_get_repository_workflow(self):
+        """Test the /repositories/{owner}/{name}/workflow endpoint with a valid repository."""
+        repo_id = 'user/repo1'
+        response = self.client.get(f'/repositories/{repo_id}/workflows')
+
+        data = self.assert_json_response(response, 200)
+
+        models = [Workflow.from_dict(item) for item in data]
+        self.assertEqual(len(models), 2)
+        # Check that all elements are Workflow instances
+        for m in models:
+            self.assertIsInstance(m, Workflow)
+            self.assertTrue(hasattr(m, 'id'))
+            self.assertTrue(hasattr(m, 'name'))
+            self.assertTrue(hasattr(m, 'created_at'))
+            self.assertTrue(hasattr(m, 'updated_at'))
+            self.assertTrue(hasattr(m, 'url'))
+            self.assertTrue(hasattr(m, 'file_url'))
+            self.assertTrue(hasattr(m, 'path'))
+            self.assertTrue(hasattr(m, 'size'))
+            self.assertTrue(hasattr(m, 'lines'))
+            self.assertTrue(hasattr(m, 'state'))
+
+    def test_get_repository_no_exist_workflow(self):
+        """ Test the /repositories/{owner}/{name}/workflow endpoint with a non-existent repository."""
+        response = self.client.get('/repositories/nonexistent_owner/nonexistent_repo/workflows')
+        self.assert_json_response(response, 404)
+
+
