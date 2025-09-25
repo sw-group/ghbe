@@ -14,7 +14,7 @@ Python 3.5.2+
 To run the server, please execute the following from the root directory:
 
 ```
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 python3 -m swagger_server
 ```
 
@@ -33,7 +33,8 @@ http://localhost:8080/ghbe/api/v1/swagger.json
 To run the tests, please execute the following from the root directory:
 
 ```
-python -m pytest --cov=swagger_server/business --cov=swagger_server/controllers swagger_server/test/ --cov-report=html
+pip install -r test-requirements.txt
+python -m pytest --cov=swagger_server/business --cov=swagger_server/controllers --cov-report=html
 ```
 
 The test coverage report will be generated in the `htmlcov` directory.

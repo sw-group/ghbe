@@ -1,4 +1,5 @@
-from swagger_server.models import RepositoriesList, Repository, IssuesList, Workflow, CommentsList
+from swagger_server.models import RepositoriesList, Repository, IssuesList, Workflow, CommentsList, Statistics, \
+    StatisticsIssues, StatisticsPulls, StatisticsWorkflows, StatisticsRepositories
 from test import BaseTestCase
 import swagger_server.db.database
 from test.fixtures import TEST_ISSUES, TEST_PULLS, TEST_WORKFLOWS, TEST_COMMENTS
@@ -76,17 +77,17 @@ class TestRepositoryController(BaseTestCase):
     def test_get_repositories_invalid_page(self):
         """Test the /repositories endpoint with a pagination less -1."""
         response = self.client.get('/repositories?page=-2')
-        self.assert_json_response(response, 400)
+        self.assert400(response, "page must be greater than or equal to 1")
 
     def test_get_repositories_invalid_parameters(self):
         """ Edge test for /repositories endpoint with invalid parameters."""
         response = self.client.get('/repositories?page=abc')
-        self.assert_json_response(response, 400)
+        self.assert400(response, "page must be an integer")
 
     def test_get_repositories_invalid_sort(self):
         """ Edge test for /repositories endpoint with invalid sort format."""
         response = self.client.get('/repositories?sort=invalid-sort-format')
-        self.assert_json_response(response, 400)
+        self.assert400(response, "Invalid sort format")
 
     """Test the /repositories/{owner}/{name} endpoint."""
     def test_get_repository(self):
@@ -103,7 +104,7 @@ class TestRepositoryController(BaseTestCase):
     def test_get_repository_not_found(self):
         """ Test the /repositories/{owner}/{name} endpoint with a non-existent repository."""
         response = self.client.get('/repositories/nonexistent_owner/nonexistent_repo')
-        self.assert_json_response(response, 404)
+        self.assert404(response, "Repository not found")
 
     """Test the /repositories/{owner}/{name}/issues endpoint."""
     def test_get_repository_issues(self):
@@ -165,25 +166,25 @@ class TestRepositoryController(BaseTestCase):
         """ Edge test for /repositories/{owner}/{name}/issues endpoint with invalid issue_type."""
         repo_id = 'user/repo1'
         response = self.client.get(f'/repositories/{repo_id}/issues?issue_type=invalid_type')
-        self.assert_json_response(response, 400)
+        self.assert400(response, "issue_type must be either 'issues' or 'pulls'")
 
     def test_get_repository_issues_invalid_page(self):
         """ Edge test for /repositories/{owner}/{name}/issues endpoint with invalid page."""
         repo_id = 'user/repo1'
         response = self.client.get(f'/repositories/{repo_id}/issues?page=-1&issue_type=issues')
-        self.assert_json_response(response, 400)
+        self.assert400(response, "page must be greater than or equal to 1")
 
     def test_get_repository_issues_without_issue_type(self):
         """ Edge test for /repositories/{owner}/{name}/issues endpoint without issue_type."""
         repo_id = 'user/repo1'
         response = self.client.get(f'/repositories/{repo_id}/issues')
-        self.assert_json_response(response, 400)
+        self.assert400(response, "issue_type parameter is required")
 
     def test_get_repository_issues_invalid_sort(self):
         """ Edge test for /repositories/{owner}/{name}/issues endpoint with invalid sort format."""
         repo_id = 'user/repo1'
         response = self.client.get(f'/repositories/{repo_id}/issues?issue_type=issues&sort=invalid-sort-format')
-        self.assert_json_response(response, 400)
+        self.assert400(response, "Invalid sort format")
 
     """Test the /repositories/{owner}/{name}/issues/{number}/comments endpoint."""
     def test_get_repository_issue_comments(self):
@@ -218,7 +219,6 @@ class TestRepositoryController(BaseTestCase):
         self.assertIsInstance(model, CommentsList)
         self.assertEquals(model.total_elements, 0)
 
-
     """Test the /repositories/{owner}/{name}/workflow endpoint."""
     def test_get_repository_workflow(self):
         """Test the /repositories/{owner}/{name}/workflow endpoint with a valid repository."""
@@ -246,6 +246,124 @@ class TestRepositoryController(BaseTestCase):
     def test_get_repository_no_exist_workflow(self):
         """ Test the /repositories/{owner}/{name}/workflow endpoint with a non-existent repository."""
         response = self.client.get('/repositories/nonexistent_owner/nonexistent_repo/workflows')
-        self.assert_json_response(response, 404)
+        self.assert404(response, "Repository not found")
 
+    """Test the /repositories/statistics endpoint."""
+    def test_get_repositories_statistics_with_filters(self):
+        """Test the /repositories/statistics endpoint with date_range_stats and language filters."""
+        response = self.client.get(
+            '/repositories/statistics?dateRangeStats=2025-09-01,2025-09-30&language=Python'
+        )
+
+        data = self.assert_json_response(response, 200)
+
+        model = Statistics.from_dict(data)
+
+        self.assertIsInstance(model, Statistics)
+
+        # Verifica che i sotto-modelli siano correttamente istanziati
+        self.assertIsInstance(model.issues, StatisticsIssues)
+        self.assertIsInstance(model.pulls, StatisticsPulls)
+        self.assertIsInstance(model.workflows, StatisticsWorkflows)
+        self.assertIsInstance(model.repositories, StatisticsRepositories)
+
+        # Alcune verifiche minime di consistenza dei dati
+        self.assertEqual(model.repositories.stats, {'bug': 2, 'enhancement': 1})
+        self.assertEqual(model.workflows.metrics['lines'], 297)
+        self.assertEqual(model.workflows.metrics['size'], 7951)
+        self.assertEqual(model.issues.daily_opened_progress, {'2025-09-01': 1, '2025-09-02': 1, '2025-09-05': 1, '2025-09-06': 1})
+        self.assertEqual(model.issues.daily_closed_progress, {})
+        self.assertEqual(model.pulls.daily_opened_progress, {'2025-09-05': 1})
+        self.assertEqual(model.pulls.daily_closed_progress, {'2025-09-02': 1})
+        self.assertEqual(model.pulls.merged, 2)
+
+    def test_get_repositories_statistics_no_matching_language(self):
+        """Test the /repositories/statistics endpoint with a language that has no matches."""
+        language = 'NonExistentLanguage'
+        response = self.client.get(
+            f'/repositories/statistics?dateRangeStats=2025-09-01,2025-09-30&language={language}'
+        )
+
+        data = self.assert_json_response(response, 200)
+
+        model = Statistics.from_dict(data)
+
+        self.assertIsInstance(model, Statistics)
+
+        # Verifica che i sotto-modelli siano correttamente istanziati
+        self.assertIsInstance(model.issues, StatisticsIssues)
+        self.assertIsInstance(model.pulls, StatisticsPulls)
+        self.assertIsInstance(model.workflows, StatisticsWorkflows)
+        self.assertIsInstance(model.repositories, StatisticsRepositories)
+
+        # Alcune verifiche minime di consistenza dei dati
+        self.assertEqual(model.repositories.stats, None)
+        self.assertEqual(model.workflows.metrics, None)
+        self.assertEqual(model.issues.daily_opened_progress, None)
+        self.assertEqual(model.issues.daily_closed_progress, None)
+        self.assertEqual(model.pulls.daily_opened_progress, None)
+        self.assertEqual(model.pulls.daily_closed_progress, None)
+        self.assertEqual(model.pulls.merged, None)
+
+    def test_get_repositories_statistics_missing_date_range(self):
+        """ Edge test for /repositories/statistics endpoint without dateRangeStats."""
+        response = self.client.get('/repositories/statistics?language=Python')
+        self.assert400(response, "dateRangeStats parameter is required")
+
+    def test_get_repositories_statistics_invalid_date_range_format(self):
+        """ Edge test for /repositories/statistics endpoint with invalid dateRangeStats format."""
+        response = self.client.get('/repositories/statistics?dateRangeStats=2025/09/01-2025/09/30&language=Python')
+        self.assert400(response, "Invalid dateRange format")
+
+    def test_get_repositories_statistics_exceeding_date_range(self):
+        """ Edge test for /repositories/statistics endpoint with dateRangeStats exceeding 1 month."""
+        response = self.client.get('/repositories/statistics?dateRangeStats=2025-09-01,2025-10-31&language=Python')
+        self.assert400(response, "dateRange cannot exceed 1 month")
+
+    def test_get_repositories_statistics_end_date_before_start_date(self):
+        """ Edge test for /repositories/statistics endpoint with end date before start date."""
+        response = self.client.get('/repositories/statistics?dateRangeStats=2025-10-01,2025-09-30&language=Python')
+        self.assert400(response, "end_date cannot be before start_date")
+
+    """Test the /repositories/{owner}/{name}/statistics endpoint."""
+    def test_get_repository_statistics_with_filters(self):
+        """Test the /repositories/{owner}/{name}/statistics endpoint with date_range_stats filter."""
+        repo_id = 'user/repo1'
+        response = self.client.get(
+            f'/repositories/{repo_id}/statistics?dateRange=2025-09-01,2025-09-30'
+        )
+
+        data = self.assert_json_response(response, 200)
+
+        model = Statistics.from_dict(data)
+
+        self.assertIsInstance(model, Statistics)
+
+        # Verifica che i sotto-modelli siano correttamente istanziati
+        self.assertIsInstance(model.issues, StatisticsIssues)
+        self.assertIsInstance(model.pulls, StatisticsPulls)
+        self.assertIsInstance(model.workflows, StatisticsWorkflows)
+        self.assertIsInstance(model.repositories, StatisticsRepositories)
+
+        # Alcune verifiche minime di consistenza dei dati
+        self.assertEqual(model.repositories.stats, {'bug': 1})
+        self.assertEqual(model.workflows.metrics['lines'], 138)
+        self.assertEqual(model.workflows.metrics['size'], 3855)
+        self.assertEqual(model.issues.daily_opened_progress, {'2025-09-01': 1, '2025-09-02': 1})
+        self.assertEqual(model.issues.daily_closed_progress, {})
+        self.assertEqual(model.pulls.daily_opened_progress, {})
+        self.assertEqual(model.pulls.daily_closed_progress, {'2025-09-02': 1})
+        self.assertEqual(model.pulls.merged, 1)
+
+    def test_get_repository_statistics_no_exist(self):
+        """ Test the /repositories/{owner}/{name}/statistics endpoint with a non-existent repository."""
+        repo_id = 'nonexistent_owner/nonexistent_repo'
+        response = self.client.get(f'/repositories/{repo_id}/statistics?dateRange=2025-09-01,2025-09-30')
+        self.assert404(response, "Repository not found")
+
+    def test_get_repository_statistics_missing_date_range(self):
+        """ Edge test for /repositories/{owner}/{name}/statistics endpoint without dateRange."""
+        repo_id = 'user/repo1'
+        response = self.client.get(f'/repositories/{repo_id}/statistics')
+        self.assert400(response, "dateRange parameter is required")
 

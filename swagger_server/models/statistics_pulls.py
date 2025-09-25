@@ -35,8 +35,8 @@ class StatisticsPulls(Model):
 
         self.attribute_map = {
             'merged': 'merged',
-            'daily_closed_progress': 'dailyClosedProgress',
-            'daily_opened_progress': 'dailyOpenedProgress'
+            'daily_closed_progress': 'daily_closed_progress',
+            'daily_opened_progress': 'daily_opened_progress'
         }
         self._merged = merged
         self._daily_closed_progress = daily_closed_progress

@@ -31,8 +31,8 @@ class StatisticsIssues(Model):
         }
 
         self.attribute_map = {
-            'daily_closed_progress': 'dailyClosedProgress',
-            'daily_opened_progress': 'dailyOpenedProgress'
+            'daily_closed_progress': 'daily_closed_progress',
+            'daily_opened_progress': 'daily_opened_progress'
         }
         self._daily_closed_progress = daily_closed_progress
         self._daily_opened_progress = daily_opened_progress

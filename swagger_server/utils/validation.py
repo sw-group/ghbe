@@ -63,3 +63,11 @@ def parse_issues_type(name: str = "issue_type"):
     if not re.match(r"^issues|pulls", value):
         abort(400, description=f"Invalid value for '{name}': must be 'issues' or 'pulls'")
     return value
+
+def parse_data_range_stats(name: str = "data_range_stats"):
+    value = request.args.get(name)
+    if value is None:
+        abort(400, description=f"data_range_stats parameter is required")
+    if not re.match(r"^\d{4}-\d{2}-\d{2},\d{4}-\d{2}-\d{2}$", value):
+        abort(400, description=f"Invalid value for '{name}': must be 'YYYY-MM-DD,YYYY-MM-DD'")
+    return value

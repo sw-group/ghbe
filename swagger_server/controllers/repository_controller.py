@@ -4,7 +4,8 @@ from swagger_server.models.issues_list import IssuesList  # noqa: E501
 from swagger_server.models.repositories_list import RepositoriesList  # noqa: E501
 from swagger_server.models.repository import Repository  # noqa: E501
 from swagger_server.models.statistics import Statistics  # noqa: E501
-from swagger_server.utils.validation import parse_bool_param, parse_sort_param, parse_positive_int, parse_issues_type
+from swagger_server.utils.validation import parse_bool_param, parse_sort_param, parse_positive_int, parse_issues_type, \
+    parse_data_range_stats
 
 
 def get_comments_of_issue(owner, name, number, page=None):  # noqa: E501
@@ -212,7 +213,7 @@ def register_repository_routes(app):
     @app.route("/repositories/statistics", methods=["GET"])
     def repositories_statistics_route():
         return jsonify(get_statistics(
-            date_range_stats=request.args.get("dateRangeStats"),
+            date_range_stats=parse_data_range_stats("dateRangeStats"),
             name=request.args.get("name"),
             language=request.args.get("language"),
             is_private=parse_bool_param("isPrivate"),
@@ -264,5 +265,5 @@ def register_repository_routes(app):
         return jsonify(get_statistics_of_repository(
             owner,
             name,
-            date_range=request.args.get("dateRange"),
+            date_range=parse_data_range_stats("dateRange"),
         ))
