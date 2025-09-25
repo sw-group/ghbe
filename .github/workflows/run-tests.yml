@@ -29,4 +29,4 @@ jobs:
 
     - name: Esegui i test
       run: |
-        pytest --maxfail=1 --disable-warnings -q
+        pytest --maxfail=1 --disable-warnings 
