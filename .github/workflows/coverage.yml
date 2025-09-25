@@ -30,7 +30,7 @@ jobs:
 
     - name: Esegui i test con coverage
       run: |
-       pytest --cov=swagger_server/business --cov=swagger_server/controllers ./test/ --cov-report=term --cov-report=html
+       pytest --cov=swagger_server/business --cov=swagger_server/controllers ./test/ --cov-report=term --cov-report=html --disable-warnings 
    
     - name: Upload coverage HTML
       uses: actions/upload-artifact@v4
